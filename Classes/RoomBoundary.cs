@@ -3,20 +3,24 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace HalvesOfTria.Classes
 {
-    // [NOTE: currently only does elastic collisions, i.e. no energy loss]
     public class RoomBoundary : IStaticCollideable, IUpdateableObject, IDrawableObject
     {
         #region Fields
         private readonly Rectangle _boundary;
         private readonly Sprite _boundaryHitboxSprite;
+        private readonly PhysicsProperties.MaterialType _materialType;
         #endregion
 
         #region Constructor
-        public RoomBoundary(GraphicsDevice graphicsDevice, int top, int bottom, int left, int right)
+        /// <summary>
+        /// Creates a new RoomBoundary with the specified dimensions and material type.
+        /// <para>By default, the material type is set to Stone.</para>
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown when the top is not less than the bottom or the left is not less than the right.</exception>"
+        public RoomBoundary(GraphicsDevice graphicsDevice, int top, int bottom, int left, int right, PhysicsProperties.MaterialType materialType = PhysicsProperties.MaterialType.Stone)
         {
             if (top >= bottom || left >= right)
             {
@@ -34,6 +38,7 @@ namespace HalvesOfTria.Classes
                 _spriteTexture,
                 spriteCentre
             );
+            _materialType = materialType;
         }
         #endregion
 
@@ -45,12 +50,14 @@ namespace HalvesOfTria.Classes
         }
         #endregion
 
+
         #region Draw Method
         public void Draw(SpriteBatch spriteBatch)
         {
             _boundaryHitboxSprite.Draw(spriteBatch);
         }
         #endregion
+
 
         #region Helper Methods
         public void HandleIncomingCollisions(List<EntityNode> entityNodes)
@@ -74,9 +81,9 @@ namespace HalvesOfTria.Classes
             }
         }
 
+        // todo: fix jittering when colliding
         private void RespondToHorizontalCollision(EntityNode entityNode)
         {
-            System.Diagnostics.Debug.WriteLine($"EntityNode {entityNode} collided with horizontal boundary. BL: {_boundary.Left}, BR: {_boundary.Right}");
             float clampedX = Math.Clamp(
                 entityNode.Position.X,
                 _boundary.Left + entityNode.Hitbox.Radius,
@@ -87,15 +94,19 @@ namespace HalvesOfTria.Classes
                 entityNode.Position.Y
             );
 
+            float restitution = PhysicsProperties.GetCombinedRestitution(
+                _materialType,
+                entityNode.MaterialType
+            );
             entityNode.Velocity = new Vector2(
-                -entityNode.Velocity.X,
+                -restitution * entityNode.Velocity.X ,
                 entityNode.Velocity.Y
             );
         }
 
+        // todo: fix jittering when colliding
         private void RespondToVerticalCollision(EntityNode entityNode)
         {
-            System.Diagnostics.Debug.WriteLine($"EntityNode {entityNode} collided with vertical boundary.");
             float clampedY = Math.Clamp(
                 entityNode.Position.Y,
                 _boundary.Top + entityNode.Hitbox.Radius,
@@ -106,9 +117,13 @@ namespace HalvesOfTria.Classes
                 clampedY
             );
 
+            float restitution = PhysicsProperties.GetCombinedRestitution(
+                _materialType,
+                entityNode.MaterialType
+            );
             entityNode.Velocity = new Vector2(
                 entityNode.Velocity.X,
-                -entityNode.Velocity.Y
+                -restitution * entityNode.Velocity.Y
             );
         }
 

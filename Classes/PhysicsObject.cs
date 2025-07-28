@@ -23,6 +23,7 @@ namespace HalvesOfTria.Classes
         /// Forces that are applied for a single frame (e.g. a jump).
         /// </remarks>
         public Vector2 ResultantInstantaneousForce { get; protected set; }
+
         /// <remarks>
         /// Currently designed to be constant (i.e. won't change if acceleration due to gravity changes or if heavy items are picked up)
         ///     [TODO: increase weight when picking up items]
@@ -31,8 +32,8 @@ namespace HalvesOfTria.Classes
         #endregion
 
 
-        #region Fields
-        private static readonly Vector2 AccelerationDueToGravity = new(0, 1140); // placeholder value
+        #region Fields        
+        private Vector2 _drag => -PhysicsProperties.PlayerDragCoefficient * Velocity.Length() * Velocity;
         private const float _minSpeed = 0.01f;
         #endregion
 
@@ -50,7 +51,7 @@ namespace HalvesOfTria.Classes
             }
             Position = initialPosition;
             Mass = mass;
-            Weight = Mass * AccelerationDueToGravity;
+            Weight = Mass * PhysicsProperties.AccelerationDueToGravity;
         }
         #endregion
 
@@ -72,6 +73,7 @@ namespace HalvesOfTria.Classes
         public virtual void Update(GameTime gameTime)
         {
             ApplyForce(Weight);
+            ApplyForce(_drag);
 
             IntegrateKinematics((float)gameTime.ElapsedGameTime.TotalSeconds);
 

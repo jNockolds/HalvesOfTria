@@ -32,6 +32,7 @@ namespace HalvesOfTria.Classes
                 _physicsObject.Velocity = value;
             }
         }
+        public readonly PhysicsProperties.MaterialType MaterialType;
         #endregion
 
         #region Constructor
@@ -44,7 +45,7 @@ namespace HalvesOfTria.Classes
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown if texture isn't square.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if radius is less than zero.</exception>
-        public EntityNode(Texture2D texture, int radius, Vector2 initialPosition, float mass, float layerDepth = 0f)
+        public EntityNode(Texture2D texture, int radius, Vector2 initialPosition, float mass, float layerDepth = 0f, PhysicsProperties.MaterialType materialType = default)
         {
             if (texture.Width != texture.Height)
             {
@@ -57,6 +58,7 @@ namespace HalvesOfTria.Classes
             }
             _physicsObject = new PhysicsObject(initialPosition, mass);
             _sprite = new Sprite(texture, initialPosition, layerDepth);
+            MaterialType = materialType;
         }
         #endregion
 
