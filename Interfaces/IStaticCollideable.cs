@@ -1,12 +1,10 @@
-﻿using System;
+﻿using HalvesOfTria.Classes;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HalvesOfTria.Interfaces
 {
     public interface IStaticCollideable
     {
+        protected void HandleIncomingCollisions(List<EntityNode> entityNodes);
     }
 }

@@ -5,13 +5,14 @@ using HalvesOfTria.Interfaces;
 namespace HalvesOfTria.Classes
 {
     /// <summary>
-    /// Represents a Texture at a Position and layer.
+    /// Describes a Texture at a Position and layer.
     /// </summary>
     public class Sprite : IDrawableObject
     {
 
         #region Properties
         public Vector2 Position { get; set; }
+        public Vector2 Size { get; private set; }
         #endregion
 
 
@@ -23,9 +24,9 @@ namespace HalvesOfTria.Classes
 
         #region Constructor
         /// <summary>
-        /// Creates a new Sprite with the specified texture, initial position, and layer depth.
+        /// Creates a new _sprite with the specified texture, initial position, and layer depth.
         /// <para>
-        /// Position is 
+        /// Position is at its centre.
         /// </para>
         /// <para>
         /// Layer depth is used to determine the rendering order of sprites. Lower values are rendered above higher ones.
@@ -36,11 +37,12 @@ namespace HalvesOfTria.Classes
             Texture = texture;
             Position = initialPosition;
             LayerDepth = layerDepth;
+            Size = new Vector2(texture.Width, texture.Height);
         }
         #endregion
 
 
-        #region Public Methods
+        #region Draw Method
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(

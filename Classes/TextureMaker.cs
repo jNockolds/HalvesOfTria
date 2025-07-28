@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 
 namespace HalvesOfTria.Classes
-{   // [TODO: in GenerateCircleTexture, try round(sqrt(distanceSquared)) <= radius instead of the current setip; don't use ceil because that may clip off the left side]
+{   
     /// <summary>
     /// A utility class for generating simple textures such as rectangles, squares, and circles.
     /// </summary>
@@ -155,7 +155,6 @@ namespace HalvesOfTria.Classes
         {
             return x < thickness || x >= width - thickness || y < thickness || y >= height - thickness;
         }
-
         private static Color[] MapUnfilledCircle(Color[] flatPixelColours, int diameter, int radius, Color colour, int thickness)
         {
             int totalPixels = diameter * diameter;
@@ -163,9 +162,7 @@ namespace HalvesOfTria.Classes
             {
                 int x = i % diameter;
                 int y = i / diameter;
-                int distanceSquared = ((radius - x) * (radius - x)) + ((radius - y) * (radius - y));
-                if ((distanceSquared < radius * radius)
-                 && (distanceSquared > (radius - thickness) * (radius - thickness)))
+                if (IsPointOnCircleBorder(x, y, radius, thickness))
                 {
                     flatPixelColours[i] = colour;
                 }
@@ -184,17 +181,24 @@ namespace HalvesOfTria.Classes
             {
                 int x = i % diameter;
                 int y = i / diameter;
-                int distanceSquared = ((radius - x) * (radius - x)) + ((radius - y) * (radius - y));
-                if (distanceSquared < radius * radius)
+                float distanceSquared = ((radius - x - 0.5f) * (radius - x - 0.5f)) + ((radius - y - 0.5f) * (radius - y - 0.5f));
+                if (distanceSquared <= radius * radius)
                 {
                     flatPixelColours[i] = colour;
                 }
                 else
                 {
                     flatPixelColours[i] = Color.Transparent;
+                    // [TODO: in GenerateCircleTexture, try round(sqrt(distance)) <= radius^2 instead of the current setip;
+                    // don't use ceil because that may clip off the left side]
                 }
             }
             return flatPixelColours;
+        }
+        private static bool IsPointOnCircleBorder(int x, int y, int radius, int thickness)
+        {
+            float distanceSquared = ((radius - x - 0.5f) * (radius - x - 0.5f)) + ((radius - y - 0.5f) * (radius - y - 0.5f));
+            return (distanceSquared <= radius * radius) && (distanceSquared >= (radius - thickness) * (radius - thickness));
         }
         #endregion
     }

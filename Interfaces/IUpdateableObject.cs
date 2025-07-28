@@ -4,6 +4,6 @@ namespace HalvesOfTria.Interfaces
 {
     public interface IUpdateableObject
     {
-        protected void Update(GameTime gameTime);
+        protected void Update(GameTime gameTime) { }
     }
 }

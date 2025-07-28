@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using HalvesOfTria.Classes;
+using HalvesOfTria.Interfaces;
+using System.Collections.Generic;
 
 namespace HalvesOfTria
 {
@@ -10,9 +12,16 @@ namespace HalvesOfTria
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        public static int WindowWidth;
+        public static int WindowHeight;
+
+        // collections:
+        public static List<EntityNode> EntityNodes { get; set; }
+
         // test variables:
         private Texture2D _testTexture;
-        private Sprite _testSprite;
+        private EntityNode _testEntityNode;
+        private RoomBoundary _testRoomBoundary;
 
 
         public Game1()
@@ -24,7 +33,11 @@ namespace HalvesOfTria
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            WindowWidth = 1280;
+            WindowHeight = 9 * WindowWidth / 16; // keeps a 16:9 aspect ratio
+            _graphics.PreferredBackBufferWidth = WindowWidth;
+            _graphics.PreferredBackBufferHeight = WindowHeight;
+            _graphics.ApplyChanges();
 
             base.Initialize();
         }
@@ -33,7 +46,23 @@ namespace HalvesOfTria
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            _testTexture = TextureMaker.GenerateCircleTexture(GraphicsDevice, 40, Color.Red, false);
+            _testEntityNode = new EntityNode(
+                _testTexture,
+                20,
+                new Vector2(300, 300),
+                1f
+            );
+            _testRoomBoundary = new RoomBoundary(
+                GraphicsDevice,
+                WindowHeight / 10,
+                9 * WindowHeight / 10,
+                WindowWidth / 10,
+                9 * WindowWidth / 10
+            );
+
+
+            EntityNodes = new List<EntityNode> { _testEntityNode };
         }
 
         protected override void Update(GameTime gameTime)
@@ -41,8 +70,8 @@ namespace HalvesOfTria
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            _testTexture = TextureMaker.GenerateCircleTexture(GraphicsDevice, 40, Color.Red, true);
-            _testSprite = new Sprite(_testTexture, new Vector2(100, 100), 0f);
+            _testEntityNode.Update(gameTime);
+            _testRoomBoundary.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -52,7 +81,8 @@ namespace HalvesOfTria
             GraphicsDevice.Clear(Color.Gray);
 
             _spriteBatch.Begin();
-            _testSprite.Draw(_spriteBatch);
+            _testEntityNode.Draw(_spriteBatch);
+            _testRoomBoundary.Draw(_spriteBatch);
             _spriteBatch.End();
 
             base.Draw(gameTime);
