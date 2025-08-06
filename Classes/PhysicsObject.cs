@@ -10,9 +10,6 @@ namespace HalvesOfTria.Classes
     /// [TODO: add air resistance and add friction (when on surface); oppose motion whichever direction it is in]
     /// Describes a kinematic object that can be updated with forces and motion.
     /// </summary>
-    /// <remarks>
-    /// Time is measured in seconds, and distance in pixels.
-    /// </remarks>
     public class PhysicsObject : IUpdateableObject
     {
         #region Properties
@@ -31,11 +28,8 @@ namespace HalvesOfTria.Classes
         ///     [TODO: increase weight when picking up items]
         /// </remarks>
         public Vector2 Weight { get; protected set; }
-        #endregion
 
-
-        #region Fields        
-        private Vector2 _drag => -PhysicsProperties.PlayerDragCoefficient * Velocity.Length() * Velocity;
+        public Vector2 PreviousResultantForce = Vector2.Zero;
         #endregion
 
 
@@ -74,11 +68,13 @@ namespace HalvesOfTria.Classes
         public virtual void Update(GameTime gameTime)
         {
             ApplyForce(Weight);
-            ApplyForce(_drag);
 
             IntegrateKinematics((float)gameTime.ElapsedGameTime.TotalSeconds);
 
             StopIfSlow();
+
+            PreviousResultantForce = ResultantForce;
+            ResetResultantForce();
         }
         #endregion
 
@@ -95,12 +91,21 @@ namespace HalvesOfTria.Classes
         /// </summary>
         /// <param name="Impulse">Force to be applied (Newtons).</param>
         public void ApplyImpulse(Vector2 Impulse) => ResultantImpulse += Impulse;
+
+        /// <summary>
+        /// Sets <see cref="ResultantForce"/> to zero.
+        /// </summary>
+        /// <remarks>Use it before applying forces in an Update method to remove previous forces.</remarks>
+        public void ResetResultantForce()
+        {
+            ResultantForce = Vector2.Zero;
+        }
         #endregion
 
 
         #region Helper Methods
         /// <summary>
-        /// If Velocity.X is close to zero (less than <see cref="_minSpeed"/>), set it to zero to stop the object from moving in the opposite direction.
+        /// If Velocity.X or Velocity.Y is close to zero (less than <see cref="PhysicsProperties.MinimumSpeed"/>), set it to zero to enable the object to stop.
         /// </summary>
         /// <remarks>
         /// Called in <see cref="Update"/> every frame.
@@ -110,6 +115,10 @@ namespace HalvesOfTria.Classes
             if (Math.Abs(Velocity.X) < PhysicsProperties.MinimumSpeed)
             {
                 Velocity = new Vector2(0, Velocity.Y);
+            }
+            if (Math.Abs(Velocity.Y) < PhysicsProperties.MinimumSpeed)
+            {
+                Velocity = new Vector2(Velocity.X, 0);
             }
         }
 
@@ -143,7 +152,6 @@ namespace HalvesOfTria.Classes
             ResultantImpulse = Vector2.Zero; // ensure forces dont't accumulate
 
             Acceleration = ResultantForce / Mass;
-            ResultantForce = Vector2.Zero; // ensure forces dont't accumulate
 
             Velocity += 0.5f * Acceleration * deltaTime;
             Position += Velocity * deltaTime;

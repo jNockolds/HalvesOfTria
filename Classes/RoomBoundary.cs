@@ -6,12 +6,19 @@ using System.Collections.Generic;
 
 namespace HalvesOfTria.Classes
 {
-    public class RoomBoundary : IStaticCollideable, IUpdateableObject, IDrawableObject
+    // [note: just a rectangle at the moment;
+    // maybe change name to 'AbsoluteRoomBoundary' and have a 'RoomBoundary' Class
+    // with an 'AbsoluteRoomBoundary' component plus some floating blocks to make a more complexly-shaped room?]
+    public class RoomBoundary : IStaticCollideable
     {
+        #region Properties
+        public readonly PhysicsProperties.MaterialType MaterialType;
+        #endregion
+
+
         #region Fields
         private readonly Rectangle _boundary;
         private readonly Sprite _boundaryHitboxSprite;
-        private readonly PhysicsProperties.MaterialType _materialType;
         #endregion
 
 
@@ -39,7 +46,7 @@ namespace HalvesOfTria.Classes
                 _spriteTexture,
                 spriteCentre
             );
-            _materialType = materialType;
+            MaterialType = materialType;
         }
         #endregion
 
@@ -60,8 +67,55 @@ namespace HalvesOfTria.Classes
         #endregion
 
 
+        #region Boolean Methods
+        public bool IsFloorInContactWith(EntityNode entityNode)
+        {
+            Rectangle aabb = entityNode.Hitbox.GetAABB();
+            return aabb.Bottom >= _boundary.Bottom;
+        }
+
+        public bool IsCeilingInContactWith(EntityNode entityNode)
+        {
+            Rectangle aabb = entityNode.Hitbox.GetAABB();
+            return aabb.Top <= _boundary.Top;
+        }
+
+        public bool IsHorizontalEdgeInContactWith(EntityNode entityNode)
+        {
+            Rectangle aabb = entityNode.Hitbox.GetAABB();
+            return IsFloorInContactWith(entityNode) 
+                || IsCeilingInContactWith(entityNode);
+        }
+
+        public bool IsLeftEdgeInContactWith(EntityNode entityNode)
+        {
+            Rectangle aabb = entityNode.Hitbox.GetAABB();
+            return aabb.Left <= _boundary.Left;
+        }
+
+        public bool IsRightEdgeInContactWith(EntityNode entityNode)
+        {
+            Rectangle aabb = entityNode.Hitbox.GetAABB();
+            return aabb.Right >= _boundary.Right;
+        }
+
+        public bool IsVerticalEdgeInContactWith(EntityNode entityNode)
+        {
+            Rectangle aabb = entityNode.Hitbox.GetAABB();
+            return IsLeftEdgeInContactWith(entityNode) 
+                || IsRightEdgeInContactWith(entityNode);
+        }
+
+        public bool IsEdgeInContactWith(EntityNode entityNode)
+        {
+            return IsHorizontalEdgeInContactWith(entityNode) 
+                || IsVerticalEdgeInContactWith(entityNode);
+        }
+        #endregion
+
+
         #region Helper Methods
-        public void HandleIncomingCollisions(List<EntityNode> entityNodes)
+        private void HandleIncomingCollisions(List<EntityNode> entityNodes)
         {
             foreach (EntityNode entityNode in entityNodes)
             {
@@ -95,11 +149,11 @@ namespace HalvesOfTria.Classes
             );
 
             float restitution = PhysicsProperties.GetCombinedRestitution(
-                _materialType,
+                MaterialType,
                 entityNode.MaterialType
             );
             entityNode.Velocity = new Vector2(
-                -restitution * entityNode.Velocity.X ,
+                -restitution * entityNode.Velocity.X,
                 entityNode.Velocity.Y
             );
         }
@@ -117,7 +171,7 @@ namespace HalvesOfTria.Classes
             );
 
             float restitution = PhysicsProperties.GetCombinedRestitution(
-                _materialType,
+                MaterialType,
                 entityNode.MaterialType
             );
             entityNode.Velocity = new Vector2(

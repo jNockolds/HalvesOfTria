@@ -20,8 +20,8 @@ namespace HalvesOfTria
 
         // test variables:
         private Texture2D _testTexture;
-        private EntityNode _testEntityNode;
-        private RoomBoundary _testRoomBoundary;
+        private PlayerSalt _testPlayerSalt;
+        public static RoomBoundary _testRoomBoundary;
 
 
         public Game1()
@@ -48,9 +48,8 @@ namespace HalvesOfTria
 
             // test variables:
             _testTexture = TextureMaker.GenerateCircleTexture(GraphicsDevice, 20, Color.Red, false);
-            _testEntityNode = new EntityNode(
+            _testPlayerSalt = new PlayerSalt(
                 _testTexture,
-                20,
                 new Vector2(300, 300),
                 1f
             );
@@ -60,15 +59,17 @@ namespace HalvesOfTria
                 8 * WindowHeight / 10
             );
 
-            EntityNodes = new List<EntityNode> { _testEntityNode };
+            EntityNodes = new List<EntityNode> { _testPlayerSalt };
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (InputManager.IsActionJustPressed(InputAction.QuickQuit))
+            {
                 Exit();
+            }
 
-            _testEntityNode.Update(gameTime);
+            _testPlayerSalt.Update(gameTime);
             _testRoomBoundary.Update(gameTime);
 
             base.Update(gameTime);
@@ -80,7 +81,7 @@ namespace HalvesOfTria
             GraphicsDevice.Clear(Color.Gray);
 
             _spriteBatch.Begin();
-            _testEntityNode.Draw(_spriteBatch);
+            _testPlayerSalt.Draw(_spriteBatch);
             _testRoomBoundary.Draw(_spriteBatch);
             _spriteBatch.End();
 

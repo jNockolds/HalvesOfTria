@@ -7,8 +7,8 @@ namespace HalvesOfTria.Classes
 {
     public enum InputAction
     {
-        MoveLeft,
-        MoveRight,
+        WalkLeft,
+        WalkRight,
         Jump,
         QuickQuit,
         DebugMove
@@ -39,8 +39,8 @@ namespace HalvesOfTria.Classes
         /// </remarks>
         private static Dictionary<InputAction, List<Keys>> _keyBindings = new()
         {
-            { InputAction.MoveLeft, new() { Keys.A, Keys.Left } },
-            { InputAction.MoveRight, new() { Keys.D, Keys.Right } },
+            { InputAction.WalkLeft, new() { Keys.A, Keys.Left } },
+            { InputAction.WalkRight, new() { Keys.D, Keys.Right } },
             { InputAction.Jump, new() { Keys.W, Keys.Up, Keys.Space } },
             { InputAction.QuickQuit, new() { Keys.Escape } },
             { InputAction.DebugMove, new() { } }
@@ -51,8 +51,8 @@ namespace HalvesOfTria.Classes
         /// </remarks>
         private static Dictionary<InputAction, List<MouseButton>> _mouseBindings = new()
         {
-            { InputAction.MoveLeft, new() { } },
-            { InputAction.MoveRight, new() { } },
+            { InputAction.WalkLeft, new() { } },
+            { InputAction.WalkRight, new() { } },
             { InputAction.Jump, new() { } },
             { InputAction.QuickQuit, new() { } },
             { InputAction.DebugMove, new() { MouseButton.Right } }
@@ -84,7 +84,7 @@ namespace HalvesOfTria.Classes
         }
         #endregion
 
-        #region Action Boolean Methods
+        #region Action Methods
         /// <summary>
         /// Checks if a specific action is currently being held down.
         /// </summary>

@@ -1,10 +1,8 @@
-﻿using HalvesOfTria.Classes;
-using System.Collections.Generic;
-
+﻿
 namespace HalvesOfTria.Interfaces
 {
-    public interface IStaticCollideable
+    public interface IStaticCollideable : IUpdateableObject, IDrawableObject
     {
-        protected void HandleIncomingCollisions(List<EntityNode> entityNodes);
+
     }
 }
