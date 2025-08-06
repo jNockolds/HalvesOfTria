@@ -24,7 +24,7 @@ namespace HalvesOfTria.Classes
         /// <remarks>
         /// Forces that are applied for a single frame (e.g. a jump).
         /// </remarks>
-        public Vector2 ResultantInstantaneousForce { get; protected set; }
+        public Vector2 ResultantImpulse { get; protected set; }
 
         /// <remarks>
         /// Currently designed to be constant (i.e. won't change if acceleration due to gravity changes or if heavy items are picked up)
@@ -65,11 +65,11 @@ namespace HalvesOfTria.Classes
         /// <remarks>
         /// This method performs the following steps:
         /// <list type="number">
-        /// <item><description>Accumulates all forces acting on the object.</description></item>
-        /// <item><description>Integrates the object's kinematics to update position and velocity.</description></item>
+        /// <item><description>Accumulates all basic forces acting on the object.</description></item>
+        /// <item><description>Integrates the object's kinematics to update position and velocity, zeroing its resultant force and .</description></item>
         /// <item><description>Stops the object if its horizontal velocity is below a defined threshold to prevent unnecessary movement.</description></item>
         /// </list>
-        /// When adding forces each frame, make sure to do so before calling this method. Otherwise, the forces will be applied in the next frame.
+        /// When adding forces each frame, make sure to do so right before calling this method. Otherwise, the forces will be applied in the next frame.
         /// </remarks>
         public virtual void Update(GameTime gameTime)
         {
@@ -79,17 +79,6 @@ namespace HalvesOfTria.Classes
             IntegrateKinematics((float)gameTime.ElapsedGameTime.TotalSeconds);
 
             StopIfSlow();
-
-            Debug.WriteLine($"Position: {Position}, Velocity: {Velocity}, Acceleration: {Acceleration}, ResultantForce: {ResultantForce}, ResultantInstantaneousForce: {ResultantInstantaneousForce}");
-
-
-            #if DEBUG
-            MouseState mouseState = Mouse.GetState();
-            if (mouseState.RightButton == ButtonState.Pressed)
-            {
-                DebugMove(new Vector2(mouseState.X, mouseState.Y));
-            }
-            #endif
         }
         #endregion
 
@@ -102,26 +91,10 @@ namespace HalvesOfTria.Classes
         public void ApplyForce(Vector2 force) => ResultantForce += force;
 
         /// <summary>
-        /// Adds an instantaneous force to <see cref="ResultantInstantaneousForce"/> over a frame.
+        /// Adds an impulse to <see cref="ResultantImpulse"/> over a frame.
         /// </summary>
-        /// <param name="instantaneousForce">Force to be applied (Newtons).</param>
-        public void ApplyInstantaneousForce(Vector2 instantaneousForce) => ResultantInstantaneousForce += instantaneousForce;
-        #endregion
-
-
-        #region Debug Methods
-        /// <summary>
-        /// Moves player to position and resets Velocity to zero.
-        /// </summary>
-        /// <remarks>
-        /// Called in <see cref="Update"/> if RMB is pressed.
-        /// </remarks>
-        /// <param name="position"> The Position to set the player to.</param>
-        private void DebugMove(Vector2 position)
-        {
-            Position = position;
-            Velocity = Vector2.Zero;
-        }
+        /// <param name="Impulse">Force to be applied (Newtons).</param>
+        public void ApplyImpulse(Vector2 Impulse) => ResultantImpulse += Impulse;
         #endregion
 
 
@@ -166,8 +139,8 @@ namespace HalvesOfTria.Classes
         /// </remarks>
         protected void IntegrateKinematics(float deltaTime)
         {
-            Velocity += ResultantInstantaneousForce / Mass; // doesn't multiply by deltaTime because this is an instantaneous force
-            ResultantInstantaneousForce = Vector2.Zero; // ensure forces dont't accumulate
+            Velocity += ResultantImpulse / Mass; // doesn't multiply by deltaTime because this is an impulse
+            ResultantImpulse = Vector2.Zero; // ensure forces dont't accumulate
 
             Acceleration = ResultantForce / Mass;
             ResultantForce = Vector2.Zero; // ensure forces dont't accumulate

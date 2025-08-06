@@ -65,8 +65,7 @@ namespace HalvesOfTria.Classes
         #region Update Method
         public virtual void Update(GameTime gameTime)
         {
-            _physicsObject.Update(gameTime);
-            SyncPositions();
+            UpdatePhysics(gameTime);
         }
         #endregion
 
@@ -76,6 +75,29 @@ namespace HalvesOfTria.Classes
             _sprite.Draw(spriteBatch);
         }
         #endregion
+
+        #region Misc. Methods
+
+        /// <summary>
+        /// Updates the physics object by applying forces, integrating motion, and stopping it if it's sufficiently slow.
+        /// </summary>
+        /// <param name="gameTime">Provides the elapsed time since the last update, used for time-based calculations.</param>
+        /// <remarks>
+        /// This method performs the following steps:
+        /// <list type="number">
+        /// <item><description>Calls <see cref="PhysicsObject.Update"/>, which accumulates basic forces acting on the object, 
+        /// integrates the object's kinematics, and stops the object if it's almost not moving.</description></item>
+        /// <item><description>Calls <see cref="SyncPositions"/> to sync the sprite's position with the physics object's position.</description></item>
+        /// </list>
+        /// When adding forces in an Update method, make sure to do so right before calling this method. Otherwise, the forces will be applied in the next frame.
+        /// </remarks>
+        protected void UpdatePhysics(GameTime gameTime)
+        {
+            _physicsObject.Update(gameTime);
+            SyncPositions();
+        }
+        #endregion
+
 
         #region Helper Methods
         private void SyncPositions()

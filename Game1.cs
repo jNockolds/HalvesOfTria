@@ -72,6 +72,7 @@ namespace HalvesOfTria
             _testRoomBoundary.Update(gameTime);
 
             base.Update(gameTime);
+            InputManager.Update();
         }
 
         protected override void Draw(GameTime gameTime)

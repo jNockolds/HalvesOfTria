@@ -20,10 +20,11 @@ namespace HalvesOfTria.Classes
         {
             Stone,
             Wood,
-            Flesh,
+            Creature,
             Thatch,
             Dirt,
             WetDirt,
+            Sand,
             PerfectlyElastic,
             PerfectlyInelastic
         }
@@ -32,10 +33,11 @@ namespace HalvesOfTria.Classes
         {
             { MaterialType.Stone,              0.35f },
             { MaterialType.Wood,               0.50f },
-            { MaterialType.Flesh,              0.30f },
+            { MaterialType.Creature,              0.30f },
             { MaterialType.Thatch,             0.30f },
             { MaterialType.Dirt,               0.60f },
             { MaterialType.WetDirt,            0.40f },
+            { MaterialType.Sand,               0f },
             { MaterialType.PerfectlyElastic,   1f },
             { MaterialType.PerfectlyInelastic, 0f },
         };
