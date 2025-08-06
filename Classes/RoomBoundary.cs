@@ -14,26 +14,27 @@ namespace HalvesOfTria.Classes
         private readonly PhysicsProperties.MaterialType _materialType;
         #endregion
 
+
         #region Constructor
         /// <summary>
-        /// Creates a new RoomBoundary with the specified dimensions and material type.
+        /// Creates a new RoomBoundary with the specified dimensions and material type at the centre of the screen.
         /// <para>By default, the material type is set to Stone.</para>
         /// </summary>
         /// <exception cref="ArgumentException">Thrown when the top is not less than the bottom or the left is not less than the right.</exception>"
-        public RoomBoundary(GraphicsDevice graphicsDevice, int top, int bottom, int left, int right, PhysicsProperties.MaterialType materialType = PhysicsProperties.MaterialType.Stone)
+        public RoomBoundary(GraphicsDevice graphicsDevice, int width, int height, PhysicsProperties.MaterialType materialType = PhysicsProperties.MaterialType.Stone)
         {
-            if (top >= bottom || left >= right)
+            if (height <= 0 || width <= 0)
             {
-                throw new ArgumentException("Invalid boundary dimensions: top must be less than bottom and left must be less than right.");
+                throw new ArgumentException("Invalid boundary dimensions: size must be positive.");
             }
-            _boundary = new Rectangle(left, top, right - left, bottom - top);
+            _boundary = new Rectangle((PhysicsProperties.WindowWidth - width) / 2, (PhysicsProperties.WindowHeight - height) / 2, width, height);
             Texture2D _spriteTexture = TextureMaker.GenerateRectangleTexture(
                 graphicsDevice,
-                right - left,
-                bottom - top,
+                width,
+                height,
                 Color.White
             );
-            Vector2 spriteCentre = new Vector2((right + left) / 2, (bottom + top) / 2);
+            Vector2 spriteCentre = new Vector2(PhysicsProperties.WindowWidth / 2, PhysicsProperties.WindowHeight / 2);
             _boundaryHitboxSprite = new Sprite(
                 _spriteTexture,
                 spriteCentre

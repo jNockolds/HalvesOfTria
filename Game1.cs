@@ -46,7 +46,8 @@ namespace HalvesOfTria
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            _testTexture = TextureMaker.GenerateCircleTexture(GraphicsDevice, 40, Color.Red, false);
+            // test variables:
+            _testTexture = TextureMaker.GenerateCircleTexture(GraphicsDevice, 20, Color.Red, false);
             _testEntityNode = new EntityNode(
                 _testTexture,
                 20,
@@ -55,12 +56,9 @@ namespace HalvesOfTria
             );
             _testRoomBoundary = new RoomBoundary(
                 GraphicsDevice,
-                WindowHeight / 10,
-                9 * WindowHeight / 10,
-                WindowWidth / 10,
-                9 * WindowWidth / 10
+                8 * WindowWidth / 10,
+                8 * WindowHeight / 10
             );
-
 
             EntityNodes = new List<EntityNode> { _testEntityNode };
         }
