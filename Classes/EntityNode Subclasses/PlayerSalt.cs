@@ -95,7 +95,7 @@ namespace HalvesOfTria.Classes
         }
         private void CutJump()
         {
-            // Implement jump cut logic
+            _physicsObject.Velocity = new Vector2(_physicsObject.Velocity.X, _physicsObject.Velocity.Y * PhysicsProperties.PlayerJumpCutFactor);
         }
         #endregion
     }

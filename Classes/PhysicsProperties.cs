@@ -18,6 +18,7 @@ namespace HalvesOfTria.Classes
         #region Player Constants
         public const float PlayerWalkingForce = 900; // placeholder value
         public const float PlayerJumpForce = 500; // placeholder value
+        public const float PlayerJumpCutFactor = 0.5f; // placeholder value
         #endregion
 
 
