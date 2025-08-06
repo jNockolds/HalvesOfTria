@@ -10,7 +10,8 @@ namespace HalvesOfTria.Classes
     public static class PhysicsProperties
     {
         public static readonly Vector2 AccelerationDueToGravity = new Vector2(0, 1140); // placeholder value
-        public const float PlayerDragCoefficient = 0.01f; // placeholder value
+        public const float PlayerDragCoefficient = 0.005f; // placeholder value
+        public const float MinimumSpeed = 0.01f; // minimum speed for any moving object
 
         public enum MaterialType
         {

@@ -1,6 +1,8 @@
 ﻿using HalvesOfTria.Interfaces;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using System;
+using System.Diagnostics;
 
 namespace HalvesOfTria.Classes
 {
@@ -34,7 +36,6 @@ namespace HalvesOfTria.Classes
 
         #region Fields        
         private Vector2 _drag => -PhysicsProperties.PlayerDragCoefficient * Velocity.Length() * Velocity;
-        private const float _minSpeed = 0.01f;
         #endregion
 
 
@@ -78,6 +79,17 @@ namespace HalvesOfTria.Classes
             IntegrateKinematics((float)gameTime.ElapsedGameTime.TotalSeconds);
 
             StopIfSlow();
+
+            Debug.WriteLine($"Position: {Position}, Velocity: {Velocity}, Acceleration: {Acceleration}, ResultantForce: {ResultantForce}, ResultantInstantaneousForce: {ResultantInstantaneousForce}");
+
+
+            #if DEBUG
+            MouseState mouseState = Mouse.GetState();
+            if (mouseState.RightButton == ButtonState.Pressed)
+            {
+                DebugMove(new Vector2(mouseState.X, mouseState.Y));
+            }
+            #endif
         }
         #endregion
 
@@ -97,7 +109,23 @@ namespace HalvesOfTria.Classes
         #endregion
 
 
-        #region Misc. Methods
+        #region Debug Methods
+        /// <summary>
+        /// Moves player to position and resets Velocity to zero.
+        /// </summary>
+        /// <remarks>
+        /// Called in <see cref="Update"/> if RMB is pressed.
+        /// </remarks>
+        /// <param name="position"> The Position to set the player to.</param>
+        private void DebugMove(Vector2 position)
+        {
+            Position = position;
+            Velocity = Vector2.Zero;
+        }
+        #endregion
+
+
+        #region Helper Methods
         /// <summary>
         /// If Velocity.X is close to zero (less than <see cref="_minSpeed"/>), set it to zero to stop the object from moving in the opposite direction.
         /// </summary>
@@ -106,7 +134,7 @@ namespace HalvesOfTria.Classes
         /// </remarks>
         protected void StopIfSlow()
         {
-            if (Math.Abs(Velocity.X) < _minSpeed)
+            if (Math.Abs(Velocity.X) < PhysicsProperties.MinimumSpeed)
             {
                 Velocity = new Vector2(0, Velocity.Y);
             }
@@ -149,6 +177,5 @@ namespace HalvesOfTria.Classes
             Velocity += 0.5f * Acceleration * deltaTime;
         }
         #endregion
-
     }
 }

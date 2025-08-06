@@ -81,7 +81,6 @@ namespace HalvesOfTria.Classes
             }
         }
 
-        // todo: fix jittering when colliding
         private void RespondToHorizontalCollision(EntityNode entityNode)
         {
             float clampedX = Math.Clamp(
@@ -104,7 +103,6 @@ namespace HalvesOfTria.Classes
             );
         }
 
-        // todo: fix jittering when colliding
         private void RespondToVerticalCollision(EntityNode entityNode)
         {
             float clampedY = Math.Clamp(
@@ -130,16 +128,16 @@ namespace HalvesOfTria.Classes
         private bool HorizontallyContains(Rectangle aabb)
         {
             return (
-                aabb.Left >= _boundary.Left &&
-                aabb.Right <= _boundary.Right
+                aabb.Left > _boundary.Left &&
+                aabb.Right < _boundary.Right
             );
         }
 
         private bool VerticallyContains(Rectangle aabb)
         {
             return (
-                aabb.Top >= _boundary.Top &&
-                aabb.Bottom <= _boundary.Bottom
+                aabb.Top > _boundary.Top &&
+                aabb.Bottom < _boundary.Bottom
             );
         }
         #endregion
