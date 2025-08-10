@@ -130,7 +130,7 @@ namespace HalvesOfTria.Classes
             {
                 RespondToHorizontalCollision(entityNode);
             }
-            else if (!VerticallyContains(aabb))
+            if (!VerticallyContains(aabb))
             {
                 RespondToVerticalCollision(entityNode);
             }
