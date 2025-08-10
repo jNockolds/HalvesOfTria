@@ -21,6 +21,7 @@ namespace HalvesOfTria
         // test variables:
         private Texture2D _testTexture;
         private PlayerSalt _testPlayerSalt;
+
         public static RoomBoundary _testRoomBoundary;
 
 
@@ -47,11 +48,10 @@ namespace HalvesOfTria
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // test variables:
-            _testTexture = TextureMaker.GenerateCircleTexture(GraphicsDevice, 20, Color.Red, false);
+            _testTexture = TextureMaker.GenerateEllipseTexture(GraphicsDevice, 20, 40, Color.Red, false);
             _testPlayerSalt = new PlayerSalt(
                 _testTexture,
-                new Vector2(300, 300),
-                1f
+                new Vector2(300, 300)
             );
             _testRoomBoundary = new RoomBoundary(
                 GraphicsDevice,

@@ -12,7 +12,8 @@ namespace HalvesOfTria.Classes
     public class RoomBoundary : IStaticCollideable
     {
         #region Properties
-        public readonly PhysicsProperties.MaterialType MaterialType;
+        public readonly PhysicsProperties.RestitutionModifier RestitutionModifier;
+        public readonly PhysicsProperties.FrictionModifier FrictionModifier;
         #endregion
 
 
@@ -28,7 +29,8 @@ namespace HalvesOfTria.Classes
         /// <para>By default, the material type is set to Stone.</para>
         /// </summary>
         /// <exception cref="ArgumentException">Thrown when the top is not less than the bottom or the left is not less than the right.</exception>"
-        public RoomBoundary(GraphicsDevice graphicsDevice, int width, int height, PhysicsProperties.MaterialType materialType = PhysicsProperties.MaterialType.Stone)
+        public RoomBoundary(GraphicsDevice graphicsDevice, int width, int height, 
+            PhysicsProperties.RestitutionModifier restitutionModifier = PhysicsProperties.RestitutionModifier.Low, PhysicsProperties.FrictionModifier frictionModifier = default)
         {
             if (height <= 0 || width <= 0)
             {
@@ -46,7 +48,8 @@ namespace HalvesOfTria.Classes
                 _spriteTexture,
                 spriteCentre
             );
-            MaterialType = materialType;
+            RestitutionModifier = restitutionModifier;
+            FrictionModifier = frictionModifier;
         }
         #endregion
 
@@ -148,9 +151,9 @@ namespace HalvesOfTria.Classes
                 entityNode.Position.Y
             );
 
-            float restitution = PhysicsProperties.GetCombinedRestitution(
-                MaterialType,
-                entityNode.MaterialType
+            float restitution = PhysicsProperties.GetRestitution(
+                RestitutionModifier,
+                entityNode.RestitutionModifier
             );
             entityNode.Velocity = new Vector2(
                 -restitution * entityNode.Velocity.X,
@@ -170,9 +173,9 @@ namespace HalvesOfTria.Classes
                 clampedY
             );
 
-            float restitution = PhysicsProperties.GetCombinedRestitution(
-                MaterialType,
-                entityNode.MaterialType
+            float restitution = PhysicsProperties.GetRestitution(
+                RestitutionModifier,
+                entityNode.RestitutionModifier
             );
             entityNode.Velocity = new Vector2(
                 entityNode.Velocity.X,

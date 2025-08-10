@@ -12,8 +12,9 @@ namespace HalvesOfTria.Classes
     public class PlayerSalt : EntityNode
     {
         #region Constructor
-        public PlayerSalt(Texture2D texture, Vector2 initialPosition, float mass, float layerDepth = 0f)
-            : base(texture, (int)texture.Width / 2, initialPosition, mass, layerDepth, PhysicsProperties.MaterialType.Player)
+        public PlayerSalt(Texture2D texture, Vector2 initialPosition, float layerDepth = 0f)
+            : base(texture, (int)texture.Height / 2, initialPosition, PhysicsProperties.PlayerMass, layerDepth, 
+                  PhysicsProperties.RestitutionModifier.Low, PhysicsProperties.FrictionModifier.Medium)
         {
             
         }
@@ -84,6 +85,7 @@ namespace HalvesOfTria.Classes
         private void WalkRight()
         {
             _physicsObject.ApplyForce(new Vector2(PhysicsProperties.PlayerWalkingForce, 0));
+            Debug.WriteLine($"Walking right with force: {PhysicsProperties.PlayerWalkingForce}");
         }
         private void Jump()
         {

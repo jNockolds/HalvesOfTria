@@ -16,128 +16,97 @@ namespace HalvesOfTria.Classes
 
 
         #region Player Constants
-        public const float PlayerWalkingForce = 900; // placeholder value
-        public const float PlayerJumpForce = 500; // placeholder value
+        public const float PlayerMass = 1f; // placeholder value
+        public const float PlayerWalkingForce = 600; // placeholder value
+        public const float PlayerJumpForce = 600; // placeholder value
         public const float PlayerJumpCutFactor = 0.5f; // placeholder value
         #endregion
 
 
         #region Physics Constants
-        public static readonly Vector2 AccelerationDueToGravity = new Vector2(0, 1140); // placeholder value
+        public static readonly Vector2 AccelerationDueToGravity = new Vector2(0, 1000); // placeholder value
+
         public const float MinimumSpeed = 10f; // minimum speed for any object to be considered moving
+        public const float DragCoefficient = 0.013f;
         #endregion
 
 
-        #region Player Properties
-        public const float SidewaysPlayerDragCoefficient = 0.02f; // placeholder value
-        public const float DownwardsPlayerDragCoefficient = 0.001f; // placeholder value
+        #region Restitution and Friction
+        private static float _restitutionBase = 0.405f;
+        private static float _frictionBase = 0.3f;
 
-
-        public const float _walkingForce = 1200; // placeholder value
-        #endregion
-
-
-        #region Fields
-        public enum MaterialType
+        public enum RestitutionModifier
         {
-            Stone,
-            Wood,
-            Player,
-            SoftCreature,
-            HardCreature,
-            Thatch,
-            DryDirt,
-            WetDirt,
-            Sand,
-
-            ElasticLowFriction,
-            ElasticHighFriction,
-            InelasticLowFriction,
-            InelasticHighFriction
+            Medium,
+            High,
+            Low,
         }
 
-        private static Dictionary<MaterialType, float> BaseRestitution = new Dictionary<MaterialType, float>
+        public enum FrictionModifier
         {
-            { MaterialType.Stone,                 0.55f },
-            { MaterialType.Wood,                  0.45f },
-            { MaterialType.Player,                0.00f },
-            { MaterialType.SoftCreature,          0.20f },
-            { MaterialType.HardCreature,          0.40f },
-            { MaterialType.Thatch,                0.20f },
-            { MaterialType.DryDirt,               0.50f },
-            { MaterialType.WetDirt,               0.35f },
-            { MaterialType.Sand,                  0.05f },
+            Medium,
+            High,
+            Low,
+        }
 
-            { MaterialType.ElasticLowFriction,    1.00f },
-            { MaterialType.ElasticHighFriction,   1.00f },
-            { MaterialType.InelasticLowFriction,  0.00f },
-            { MaterialType.InelasticHighFriction, 0.00f },
+        private static Dictionary<RestitutionModifier, float> RestitutionModifierValues = new Dictionary<RestitutionModifier, float>
+        {
+            { RestitutionModifier.Medium,  0.0f },
+            { RestitutionModifier.High,    0.2f },
+            { RestitutionModifier.Low,    -0.2f }
         };
 
-        private static Dictionary<MaterialType, float> BaseFriction = new Dictionary<MaterialType, float>
+        private static Dictionary<FrictionModifier, float> FrictionModifierValues = new Dictionary<FrictionModifier, float>
         {
-            { MaterialType.Stone,                 0.60f },
-            { MaterialType.Wood,                  0.40f },
-            { MaterialType.Player,                0.30f },
-            { MaterialType.SoftCreature,          0.50f },
-            { MaterialType.HardCreature,          0.30f },
-            { MaterialType.Thatch,                0.50f },
-            { MaterialType.DryDirt,               0.80f },
-            { MaterialType.WetDirt,               0.65f },
-            { MaterialType.Sand,                  0.55f },
-
-            { MaterialType.ElasticLowFriction,    0.00f },
-            { MaterialType.ElasticHighFriction,   1.00f },
-            { MaterialType.InelasticLowFriction,  0.00f },
-            { MaterialType.InelasticHighFriction, 1.00f },
+            { FrictionModifier.Medium, 0.0f },
+            { FrictionModifier.High,   0.2f },
+            { FrictionModifier.Low,   -0.2f }
         };
-        #endregion
 
-
-        #region Material Properties For Collisions
         /// <summary>
-        /// Calculates the combined restitution coefficient for two materials, using the geometric mean of each material's 'base restitution'.
+        /// Calculates the combined restitution coefficient based on two restitution modifiers.
         /// </summary>
-        /// <remarks>
-        /// It is biased towards the larger value.
-        /// </remarks>
-        /// <exception cref="ArgumentException">Thrown when an invalid material type is provided.</exception>
-        public static float GetCombinedRestitution(MaterialType material1, MaterialType material2)
+        /// <param name="modifier1">The restitution modifier for the first object.</param>
+        /// <param name="modifier2">The restitution modifier for the second object.</param>
+        /// <returns>
+        /// A <see cref="float"/> representing the combined restitution value, 
+        /// which is the base restitution adjusted by the modifier values.
+        /// The returned value is guaranteed to be between 0.0 and 1.0 inclusive.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown if either <paramref name="modifier1"/> or <paramref name="modifier2"/> is not a valid key in the restitution modifier dictionary.
+        /// </exception>
+        public static float GetRestitution(RestitutionModifier modifier1, RestitutionModifier modifier2)
         {
-            if (BaseRestitution.TryGetValue(material1, out float restitution1) &&
-                BaseRestitution.TryGetValue(material2, out float restitution2))
+            if (RestitutionModifierValues.TryGetValue(modifier1, out float modifier1Val) &&
+                RestitutionModifierValues.TryGetValue(modifier2, out float modifier2Val))
             {
-                return GeometricMean(restitution1, restitution2);
+                return Math.Clamp(_restitutionBase + modifier1Val + modifier2Val, 0, 1);
             }
-            throw new ArgumentException("Invalid material type(s) provided.");
+            throw new ArgumentException("Invalid restitution modifier(s) provided.");
         }
 
         /// <summary>
-        /// Calculates the combined friction coefficient for two materials, using the geometric mean of each material's 'base friction'.
+        /// Calculates the combined friction coefficient based on two friction modifiers.
         /// </summary>
-        /// <remarks>
-        /// It is biased towards the larger value.
-        /// </remarks>
-        /// <exception cref="ArgumentException">Thrown when an invalid material type is provided.</exception>
-        public static float GetCombinedFriction(MaterialType material1, MaterialType material2)
+        /// <param name="modifier1">The friction modifier for the first object.</param>
+        /// <param name="modifier2"> The friction modifier for the second object.</param>
+        /// <returns>
+        /// A <see cref="float"/> representing the combined friction value,
+        /// which is the base friction adjusted by the modifier values.
+        /// The returned value is guaranteed to be greater than or equal to 0.0.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown if either <paramref name="modifier1"/> or <paramref name="modifier2"/> is not a valid key in the friction modifier dictionary.
+        /// </exception>
+        public static float GetFriction(FrictionModifier modifier1, FrictionModifier modifier2)
         {
-            if (BaseFriction.TryGetValue(material1, out float friction1) &&
-                BaseFriction.TryGetValue(material2, out float friction2))
+            if (FrictionModifierValues.TryGetValue(modifier1, out float modifier1Val) &&
+                FrictionModifierValues.TryGetValue(modifier2, out float modifier2Val))
             {
-                return GeometricMean(friction1, friction2);
+                return Math.Clamp(_frictionBase + modifier1Val + modifier2Val, 0, 1);
             }
-            throw new ArgumentException("Invalid material type(s) provided.");
-        }
-        #endregion
-
-
-        #region Helper Methods
-        /// <summary>
-        /// Calculates the geometric mean of two values.
-        /// </summary>
-        private static float GeometricMean(float a, float b)
-        {
-            return (float)Math.Sqrt(a * b);
+            throw new ArgumentException("Invalid friction modifier(s) provided.");
         }
         #endregion
     }

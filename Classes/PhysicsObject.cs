@@ -24,10 +24,9 @@ namespace HalvesOfTria.Classes
         public Vector2 ResultantImpulse { get; protected set; }
 
         /// <remarks>
-        /// Currently designed to be constant (i.e. won't change if acceleration due to gravity changes or if heavy items are picked up)
-        ///     [TODO: increase weight when picking up items]
+        /// [TODO: increase weight when picking up items]
         /// </remarks>
-        public Vector2 Weight { get; protected set; }
+        public Vector2 Weight => Mass * PhysicsProperties.AccelerationDueToGravity;
 
         public Vector2 PreviousResultantForce = Vector2.Zero;
         #endregion
@@ -35,7 +34,7 @@ namespace HalvesOfTria.Classes
 
         #region Constructor
         /// <summary>
-        /// Creates a new _physicsObject with the specified initial position and mass.
+        /// Creates a new PhysicsObject with the specified initial position and mass.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if mass is less than or equal to zero.</exception>
         public PhysicsObject(Vector2 initialPosition, float mass)
@@ -46,7 +45,6 @@ namespace HalvesOfTria.Classes
             }
             Position = initialPosition;
             Mass = mass;
-            Weight = Mass * PhysicsProperties.AccelerationDueToGravity;
         }
         #endregion
 
@@ -68,11 +66,10 @@ namespace HalvesOfTria.Classes
         public virtual void Update(GameTime gameTime)
         {
             ApplyForce(Weight);
-
             IntegrateKinematics((float)gameTime.ElapsedGameTime.TotalSeconds);
 
             StopIfSlow();
-
+            
             PreviousResultantForce = ResultantForce;
             ResetResultantForce();
         }

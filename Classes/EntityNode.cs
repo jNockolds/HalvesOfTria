@@ -37,17 +37,11 @@ namespace HalvesOfTria.Classes
         }
 
         public RoomBoundary CurrentRoom => Game1._testRoomBoundary; // [TODO: change to be accurate for any room; updates every time the room changes or just reads the current room from Game1?]
-        public PhysicsProperties.MaterialType MaterialType;
+        public readonly PhysicsProperties.RestitutionModifier RestitutionModifier;
+        public readonly PhysicsProperties.FrictionModifier FrictionModifier;
         #endregion
 
         #region Fields
-        private Vector2 _getDrag() // [temporary; will use better drag formula later, accounting for surface area]
-        {
-            float horizontalDrag = - PhysicsProperties.SidewaysPlayerDragCoefficient * Velocity.X * Math.Abs(Velocity.X);
-            float verticalDrag = - PhysicsProperties.DownwardsPlayerDragCoefficient * Velocity.Y * Math.Abs(Velocity.Y);
-            return new Vector2(horizontalDrag, verticalDrag);
-        } 
-
         private Vector2 _previousResultantForce = Vector2.Zero;
         #endregion
 
@@ -61,12 +55,13 @@ namespace HalvesOfTria.Classes
         /// </remarks>
         /// <exception cref="ArgumentException">Thrown if texture isn't square.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if radius is less than zero.</exception>
-        public EntityNode(Texture2D texture, int radius, Vector2 initialPosition, float mass, float layerDepth = 0f, PhysicsProperties.MaterialType materialType = default)
+        public EntityNode(Texture2D texture, int radius, Vector2 initialPosition, float mass, float layerDepth = 0f, 
+            PhysicsProperties.RestitutionModifier restitutionModifier = PhysicsProperties.RestitutionModifier.Low, PhysicsProperties.FrictionModifier frictionModifier = default)
         {
-            if (texture.Width != texture.Height)
-            {
-                throw new ArgumentException("Texture must be square for this EntityNode constructor.");
-            }
+            //if (texture.Width != texture.Height)
+            //{
+            //    throw new ArgumentException("Texture must be square for this EntityNode constructor.");
+            //}
 
             if (radius < 0)
             {
@@ -74,7 +69,8 @@ namespace HalvesOfTria.Classes
             }
             _physicsObject = new PhysicsObject(initialPosition, mass);
             _sprite = new Sprite(texture, initialPosition, layerDepth);
-            MaterialType = materialType;
+            RestitutionModifier = restitutionModifier;
+            FrictionModifier = frictionModifier;
         }
         #endregion
 
@@ -99,7 +95,7 @@ namespace HalvesOfTria.Classes
         public virtual void Update(GameTime gameTime)
         {
             HandleFriction(_physicsObject.PreviousResultantForce);
-            _physicsObject.ApplyForce(_getDrag()); // [replace with HandleDrag() when implemented]
+            _physicsObject.ApplyForce(GetDrag()); // [replace with HandleDrag() when implemented]
 
             _physicsObject.Update(gameTime);
             SyncPositions();
@@ -124,7 +120,7 @@ namespace HalvesOfTria.Classes
                 return;
             }
 
-            float frictionCoefficient = PhysicsProperties.GetCombinedFriction(MaterialType, CurrentRoom.MaterialType);
+            float frictionCoefficient = PhysicsProperties.GetFriction(FrictionModifier, CurrentRoom.FrictionModifier);
             float frictionMagnitude;
 
             
@@ -132,13 +128,14 @@ namespace HalvesOfTria.Classes
                 && previousResultantForce.Y > 0)
             {
                 frictionMagnitude = frictionCoefficient * previousResultantForce.Y;
-                Debug.WriteLine($"Applied friction: {frictionMagnitude}");
                 if (_physicsObject.Velocity.X < 0)
                 {
+                    Debug.WriteLine("Applying friction");
                     _physicsObject.ApplyForce(new Vector2(frictionMagnitude, 0));
                 }
                 else if (_physicsObject.Velocity.X > 0)
                 {
+                    Debug.WriteLine("Applying friction");
                     _physicsObject.ApplyForce(new Vector2(-frictionMagnitude, 0));
                 }
             }
@@ -147,13 +144,14 @@ namespace HalvesOfTria.Classes
                 && previousResultantForce.Y < 0)
             {
                 frictionMagnitude = - frictionCoefficient * previousResultantForce.Y;
-                Debug.WriteLine($"Applied friction: {frictionMagnitude}");
                 if (_physicsObject.Velocity.X < 0)
                 {
+                    Debug.WriteLine("Applying friction");
                     _physicsObject.ApplyForce(new Vector2(frictionMagnitude, 0));
                 }
                 else if (_physicsObject.Velocity.X > 0)
                 {
+                    Debug.WriteLine("Applying friction");
                     _physicsObject.ApplyForce(new Vector2(-frictionMagnitude, 0));
                 }
             }
@@ -162,13 +160,14 @@ namespace HalvesOfTria.Classes
                 && previousResultantForce.X < 0)
             {
                 frictionMagnitude = - frictionCoefficient * previousResultantForce.X;
-                Debug.WriteLine($"Applied friction: {frictionMagnitude}");
                 if (_physicsObject.Velocity.Y < 0)
                 {
+                    Debug.WriteLine("Applying friction");
                     _physicsObject.ApplyForce(new Vector2(0, frictionMagnitude));
                 }
                 else if (_physicsObject.Velocity.Y > 0)
                 {
+                    Debug.WriteLine("Applying friction");
                     _physicsObject.ApplyForce(new Vector2(0, -frictionMagnitude));
                 }
             }
@@ -177,19 +176,27 @@ namespace HalvesOfTria.Classes
                 && previousResultantForce.X > 0)
             {
                 frictionMagnitude = frictionCoefficient * previousResultantForce.X;
-                Debug.WriteLine($"Applied friction: {frictionMagnitude}");
                 if (_physicsObject.Velocity.Y < 0)
                 {
+                    Debug.WriteLine("Applying friction");
                     _physicsObject.ApplyForce(new Vector2(0, frictionMagnitude));
                 }
                 else if (_physicsObject.Velocity.Y > 0)
                 {
+                    Debug.WriteLine("Applying friction");
                     _physicsObject.ApplyForce(new Vector2(0, -frictionMagnitude));
                 }
             }
-
         }
-        
+
+        private Vector2 GetDrag()
+        {
+            float horizontalDrag = -PhysicsProperties.DragCoefficient * Velocity.X * Math.Abs(Velocity.X);
+            float verticalDrag = -PhysicsProperties.DragCoefficient * Velocity.Y * Math.Abs(Velocity.Y);
+
+            Debug.WriteLine($"Horizontal Drag: {horizontalDrag}, Vertical Drag: {verticalDrag}");
+            return new Vector2(horizontalDrag, verticalDrag);
+        }
 
         private void SyncPositions()
         {
