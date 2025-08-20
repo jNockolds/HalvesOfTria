@@ -23,6 +23,7 @@ namespace HalvesOfTria
         private PlayerSalt _testPlayerSalt;
 
         public static RoomBoundary _testRoomBoundary;
+        private StaticBlock _testStaticBlock;
 
 
         public Game1()
@@ -59,6 +60,13 @@ namespace HalvesOfTria
                 8 * WindowHeight / 10
             );
 
+            _testStaticBlock = new StaticBlock(
+                GraphicsDevice,
+                new Vector2(500, 550),
+                100,
+                50
+            );
+
             EntityNodes = new List<EntityNode> { _testPlayerSalt };
         }
 
@@ -71,6 +79,7 @@ namespace HalvesOfTria
 
             _testPlayerSalt.Update(gameTime);
             _testRoomBoundary.Update(gameTime);
+            _testStaticBlock.Update(gameTime);
 
             base.Update(gameTime);
             InputManager.Update();
@@ -83,6 +92,7 @@ namespace HalvesOfTria
             _spriteBatch.Begin();
             _testPlayerSalt.Draw(_spriteBatch);
             _testRoomBoundary.Draw(_spriteBatch);
+            _testStaticBlock.Draw(_spriteBatch);
             _spriteBatch.End();
 
             base.Draw(gameTime);

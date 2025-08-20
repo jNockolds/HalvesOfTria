@@ -18,6 +18,7 @@ namespace HalvesOfTria.Classes
 
         #region Properties
         public Circle Hitbox => new Circle(_physicsObject.Position, (int)_sprite.Size.X / 2);
+        public readonly int Radius;
         public Vector2 Position
         {
             get => _physicsObject.Position;
@@ -41,9 +42,11 @@ namespace HalvesOfTria.Classes
         public readonly PhysicsProperties.FrictionModifier FrictionModifier;
         #endregion
 
+
         #region Fields
         private Vector2 _previousResultantForce = Vector2.Zero;
         #endregion
+
 
         #region Constructor
         /// <summary>
@@ -69,6 +72,7 @@ namespace HalvesOfTria.Classes
             }
             _physicsObject = new PhysicsObject(initialPosition, mass);
             _sprite = new Sprite(texture, initialPosition, layerDepth);
+            Radius = radius;
             RestitutionModifier = restitutionModifier;
             FrictionModifier = frictionModifier;
         }

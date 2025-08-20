@@ -24,7 +24,7 @@ namespace HalvesOfTria.Classes
 
         #region Constructor
         /// <summary>
-        /// Creates a new _sprite with the specified texture, initial position, and layer depth.
+        /// Creates a new Sprite with the specified texture, initial position, and layer depth.
         /// <para>
         /// Position is at its centre.
         /// </para>

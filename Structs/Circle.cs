@@ -69,7 +69,7 @@ namespace HalvesOfTria.Structs
         public bool Intersects(Rectangle rectangle)
         {
             // Check if the rectangle and circle's axis-aligned bounding box intersect:
-            if (!GetAABB().Intersects(rectangle)) // if so, no collision occurs
+            if (!GetAABB().Intersects(rectangle)) // if not, no collision occurs
             {
                 return false;
             }
