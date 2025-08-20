@@ -48,7 +48,7 @@ namespace HalvesOfTria
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // test variables:
-            _testTexture = TextureMaker.GenerateEllipseTexture(GraphicsDevice, 20, 40, Color.Red, false);
+            _testTexture = TextureMaker.GenerateCircleTexture(GraphicsDevice, 20, Color.Red, false);
             _testPlayerSalt = new PlayerSalt(
                 _testTexture,
                 new Vector2(300, 300)

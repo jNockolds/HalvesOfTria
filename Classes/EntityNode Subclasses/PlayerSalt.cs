@@ -60,9 +60,16 @@ namespace HalvesOfTria.Classes
                 Jump();
             }
             if (InputManager.IsActionJustPressed(InputAction.Jump)
-                && CurrentRoom.IsVerticalEdgeInContactWith(this))
+                && InputManager.IsActionHeld(InputAction.WalkRight)
+                && CurrentRoom.IsRightEdgeInContactWith(this))
             {
-                WallJump();
+                WallJumpFromRight();
+            }
+            if (InputManager.IsActionJustPressed(InputAction.Jump)
+                && InputManager.IsActionHeld(InputAction.WalkLeft)
+                && CurrentRoom.IsLeftEdgeInContactWith(this))
+            {
+                WallJumpFromLeft();
             }
             if (InputManager.IsActionJustReleased(InputAction.Jump)
                 && Velocity.Y < 0
@@ -70,12 +77,12 @@ namespace HalvesOfTria.Classes
             {
                 CutJump();
             }
-#if DEBUG
+            #if DEBUG
             if (InputManager.IsActionHeld(InputAction.DebugMove))
             {
                 DebugMove(InputManager.MousePosition);
             }
-#endif
+            #endif
         }
 
         private void WalkLeft()
@@ -91,9 +98,13 @@ namespace HalvesOfTria.Classes
         {
             _physicsObject.ApplyImpulse(new Vector2(0, -PhysicsProperties.PlayerJumpForce));
         }
-        private void WallJump()
+        private void WallJumpFromRight() // todo: adjust exact vertical and horizontal impulse balance
         {
-            // Implement wall jump logic; use ApplyImpulse
+            _physicsObject.ApplyImpulse(new Vector2(-0.5f * PhysicsProperties.PlayerJumpForce, -0.5f * PhysicsProperties.PlayerJumpForce));
+        }
+        private void WallJumpFromLeft() // todo: adjust exact vertical and horizontal impulse balance
+        {
+            _physicsObject.ApplyImpulse(new Vector2(0.5f * PhysicsProperties.PlayerJumpForce, -0.5f * PhysicsProperties.PlayerJumpForce));
         }
         private void CutJump()
         {
