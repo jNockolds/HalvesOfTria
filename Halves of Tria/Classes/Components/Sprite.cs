@@ -29,7 +29,7 @@ namespace Halves_of_Tria.Classes.Components
         #endregion
 
 
-        #region Draw Method
+        #region Methods
         public void Draw(SpriteBatch spriteBatch)
         {
             Transform transform = Entity.GetComponent<Transform>();

@@ -1,13 +1,43 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Halves_of_Tria.Classes;
+using Halves_of_Tria.Classes.Entities;
 
 namespace Halves_of_Tria
 {
     public class Game1 : Game
     {
+        #region Properties
+        public int WindowWidth
+        {
+            get => _graphics.PreferredBackBufferWidth;
+            set
+            {
+                _graphics.PreferredBackBufferWidth = value;
+                _graphics.ApplyChanges();
+            }
+        }
+        public int WindowHeight
+        {
+            get => _graphics.PreferredBackBufferHeight;
+            set
+            {
+                _graphics.PreferredBackBufferHeight = value;
+                _graphics.ApplyChanges();
+            }
+        }
+        #endregion
+
+        #region Fields
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+
+        private Texture2D _saltTexture;
+        private Salt _salt;
+        #endregion
+
+
 
         public Game1()
         {
@@ -18,7 +48,7 @@ namespace Halves_of_Tria
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            WindowWidth = 800;
 
             base.Initialize();
         }
@@ -27,7 +57,9 @@ namespace Halves_of_Tria
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            _saltTexture = TextureGenerator.GenerateRectangleTexture(GraphicsDevice, 40, 120, Color.White, true);
+            Vector2 saltInitialPosition = new Vector2(WindowWidth / 2, WindowHeight / 2);
+            _salt = new Salt(saltInitialPosition, _saltTexture);
         }
 
         protected override void Update(GameTime gameTime)
@@ -35,16 +67,20 @@ namespace Halves_of_Tria
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            // Update all systems
+            TransformSystem.Update(gameTime);
+            SpriteSystem.Update(gameTime);
 
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Gray);
 
-            // TODO: Add your drawing code here
+            _spriteBatch.Begin();
+            SpriteSystem.Draw(_spriteBatch);
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }

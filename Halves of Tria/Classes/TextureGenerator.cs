@@ -2,12 +2,12 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
-namespace Halves_Of_Tria.Classes
+namespace Halves_of_Tria.Classes
 {
     /// <summary>
     /// A utility class for generating simple textures such as rectangles, squares, and circles.
     /// </summary>
-    public class TextureGenerator
+    public static class TextureGenerator
     {
         #region Public Methods
         /// <summary>

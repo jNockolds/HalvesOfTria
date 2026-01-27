@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Halves_of_Tria.Classes.Components;
+
 
 namespace Halves_of_Tria.Classes
 {
@@ -21,6 +24,15 @@ namespace Halves_of_Tria.Classes
         }
     }
 
-    class TransformSystem : System<Components.Transform> { }
-    class SpriteSystem : System<Components.Sprite> { }
+    class TransformSystem : System<Transform> { }
+    class SpriteSystem : System<Sprite>
+    {
+        public static void Draw(SpriteBatch spriteBatch)
+        {
+            foreach (Sprite sprite in Components)
+            {
+                sprite.Draw(spriteBatch);
+            }
+        }
+    }
 }
