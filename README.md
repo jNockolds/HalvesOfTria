@@ -11,7 +11,7 @@
 
 | Name | End Goal                                          | Status      | Date Completed |
 | ---- | ------------------------------------------------- | ----------- | -------------- |
-| 1    | Technical Setup                                   | Not Started |                |
+| 1    | Technical Setup                                   | In Progress |                |
 | 2    | Primary Player Character                          | Not Started |                |
 | 3    | Secondary Player Character                        | Not Started |                |
 | 4    | Environment                                       | Not Started |                |
