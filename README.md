@@ -12,8 +12,8 @@
 | Name | End Goal                                          | Status      | Date Completed |
 | ---- | ------------------------------------------------- | ----------- | -------------- |
 | 1    | Technical Setup                                   | In Progress |                |
-| 2    | Primary Player Character                          | Not Started |                |
-| 3    | Secondary Player Character                        | Not Started |                |
+| 2    | Primary Player Character (Salt)                   | Not Started |                |
+| 3    | Secondary Player Character (Sulphur)              | Not Started |                |
 | 4    | Environment                                       | Not Started |                |
 | 5    | Capsule Colliders and Procedural Animation Basics | Not Started |                |
 | 6    | Items and Interactables                           | Not Started |                |
