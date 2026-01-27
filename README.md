@@ -1,6 +1,41 @@
 # Halves Of Tria
 
+## Libraries Used
+
+- [MonoGame.Extended](https://www.monogameextended.net/)
+
 ## Roadmap
+(Note: This roadmap will expand as the project progresses.)
+
+### Stage Summaries
+
+| Name | End Goal                                          | Status      | Date Completed |
+| ---- | ------------------------------------------------- | ----------- | -------------- |
+| 1    | Technical Setup                                   | Not Started |                |
+| 2    | Primary Player Character                          | Not Started |                |
+| 3    | Secondary Player Character                        | Not Started |                |
+| 4    | Environment                                       | Not Started |                |
+| 5    | Capsule Colliders and Procedural Animation Basics | Not Started |                |
+| 6    | Items and Interactables                           | Not Started |                |
+| 7    | Health, Death, and Respawning                     | Not Started |                |
+| 8    | First Creatures                                   | Not Started |                |
+| 9    | Graphical User Interface                          | Not Started |                |
+| 10   | Room Connectivity and Editor                      | Not Started |                |
+| 11   | Simple Environmental Pixel Art                    | Not Started |                |
+| 12   | Improved Pixel Art Procedural <br>Animation       | Not Started |                |
+| 13   | Container Item with Inventory System              | Not Started |                |
+| 14   | Transmutation System                              | Not Started |                |
+| 15   | Persistent Data Storage and Save Points           | Not Started |                |
+| 16   | Creature Types                                    | Not Started |                |
+| 17   | Ecosystem Simulation                              | Not Started |                |
+| 18   | Day-Night Cycle                                   | Not Started |                |
+| 19   | NPCs, Dialogue, and Dynamic Relationships         | Not Started |                |
+| 20   | Regions and The Map                               | Not Started |                |
+| 21   | Basic Audio                                       | Not Started |                |
+| 22   | Player Character Abilities                        | Not Started |                |
+| 23   | First Narrative Spine                             | Not Started |                |
+| 24   | Polish                                            | Not Started |                |
+| 25   | Fleshed Out Band                                  | Not Started |                |
 
 ### Stage 1 - Technical Setup
 
