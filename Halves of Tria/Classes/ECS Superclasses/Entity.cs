@@ -4,17 +4,17 @@ namespace Halves_of_Tria.Classes
 {
     class Entity
     {
-        List<Component> components = new List<Component>();
+        List<Component> Components = new List<Component>();
 
         public void AddComponent(Component component)
         {
-            components.Add(component);
-            component.entity = this;
+            Components.Add(component);
+            component.Entity = this;
         }
 
         public T GetComponent<T>() where T : Component
         {
-            foreach (Component component in components)
+            foreach (Component component in Components)
             {
                 if (component is T)
                 {
