@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Halves_of_Tria.Classes;
 using Halves_of_Tria.Classes.Entities;
+using MonoGame.Extended.Input;
 
 namespace Halves_of_Tria
 {
@@ -48,8 +49,10 @@ namespace Halves_of_Tria
 
         protected override void Initialize()
         {
-            WindowWidth = 800;
+            WindowWidth = 1280;
+            WindowHeight = 720;
 
+            InputManager.Initialize();
             base.Initialize();
         }
 
@@ -64,7 +67,9 @@ namespace Halves_of_Tria
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            InputManager.Update();
+
+            if (InputManager.IsActionHeld(InputAction.QuickQuit))
                 Exit();
 
             // Update all systems
