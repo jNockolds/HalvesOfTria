@@ -5,7 +5,7 @@
 - [MonoGame.Extended](https://www.monogameextended.net/)
 
 ## Roadmap
-(Note: This roadmap will expand as the project progresses.)
+(Note: This roadmap will expand and each stage will gain more detail as the project progresses.)
 
 ### Stage Summaries
 
