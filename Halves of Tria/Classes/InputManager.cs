@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Input;
-using System.Diagnostics;
 
 namespace Halves_of_Tria.Classes
 {
@@ -35,32 +32,9 @@ namespace Halves_of_Tria.Classes
 
         // Current Bindings:
 
-        private static Dictionary<InputAction, List<Keys>> _keyboardBindings = new()
-        {
-            { InputAction.SaltWalkLeft, new List<Keys> { } },
-            { InputAction.SaltWalkRight, new List<Keys> { } },
-            { InputAction.SaltJump, new List<Keys> { } },
-            { InputAction.QuickQuit, new List<Keys> { } },
-            { InputAction.SaltDebugMove, new List<Keys> { } }
-        };
-
-        private static Dictionary<InputAction, List<MouseButton>> _mouseBindings = new()
-        {
-            { InputAction.SaltWalkLeft, new List<MouseButton> { } },
-            { InputAction.SaltWalkRight, new List<MouseButton> { } },
-            { InputAction.SaltJump, new List<MouseButton> { } },
-            { InputAction.QuickQuit, new List<MouseButton> { } },
-            { InputAction.SaltDebugMove, new List<MouseButton> { } }
-        };
-
-        private static Dictionary<InputAction, List<Buttons>> _gamepadBindings = new()
-        {
-            { InputAction.SaltWalkLeft, new List<Buttons> { } },
-            { InputAction.SaltWalkRight, new List<Buttons> { } },
-            { InputAction.SaltJump, new List<Buttons> { } },
-            { InputAction.QuickQuit, new List<Buttons> { } },
-            { InputAction.SaltDebugMove, new List<Buttons> { } }
-        };
+        private static Dictionary<InputAction, List<Keys>> _keyboardBindings = new();
+        private static Dictionary<InputAction, List<MouseButton>> _mouseBindings = new();
+        private static Dictionary<InputAction, List<Buttons>> _gamepadBindings = new();
 
 
         // Default Bindings:
@@ -70,14 +44,14 @@ namespace Halves_of_Tria.Classes
             { InputAction.SaltWalkLeft, new List<Keys> { Keys.A, Keys.Left } },
             { InputAction.SaltWalkRight, new List<Keys> { Keys.D, Keys.Right } },
             { InputAction.SaltJump, new List<Keys> { Keys.W, Keys.Up, Keys.Space } },
-            { InputAction.QuickQuit, new List<Keys> { Keys.Escape } }
+            { InputAction.QuickQuit, new List<Keys> { Keys.X } }
         };
 
         private static Dictionary<InputAction, List<MouseButton>> _defaultMouseBindings = new()
         {
             { InputAction.SaltWalkLeft, new List<MouseButton> { } },
             { InputAction.SaltDebugMove, new List<MouseButton> { MouseButton.Right } },
-            { InputAction.QuickQuit, new List<MouseButton> { MouseButton.Right } }
+            { InputAction.QuickQuit, new List<MouseButton> { MouseButton.Middle } }
         };
 
         private static Dictionary<InputAction, List<Buttons>> _defaultGamepadBindings = new()
@@ -85,14 +59,16 @@ namespace Halves_of_Tria.Classes
             { InputAction.SaltWalkLeft, new List<Buttons> { Buttons.DPadLeft, Buttons.LeftThumbstickLeft } },
             { InputAction.SaltWalkRight, new List<Buttons> { Buttons.DPadRight, Buttons.LeftThumbstickRight } },
             { InputAction.SaltJump, new List<Buttons> { Buttons.A } },
-            { InputAction.QuickQuit, new List<Buttons> { Buttons.B } }
+            { InputAction.QuickQuit, new List<Buttons> { Buttons.B, Buttons.LeftThumbstickDown, Buttons.RightTrigger } }
         };
         #endregion
 
         #region Game Loop Methods
         public static void Initialize()
         {
+            InitializeBindingDictionaries();
             ResetBindingsToDefault();
+
             _gamepadState = GamePad.GetState(PlayerIndex.One);
             _previousGamepadState = _gamepadState;
         }
@@ -100,12 +76,14 @@ namespace Halves_of_Tria.Classes
         public static void Update()
         {
             KeyboardExtended.Update();
+            MouseExtended.Update();
+
             _previousGamepadState = _gamepadState;
             _gamepadState = GamePad.GetState(PlayerIndex.One);
         }
         #endregion
 
-        #region Add Binding Methods
+        #region Binding Methods
         public static void AddActionBinding(InputAction action, Keys button)
         {
             if (!_keyboardBindings[action].Contains(button))
@@ -175,9 +153,6 @@ namespace Halves_of_Tria.Classes
                 AddActionBinding(action, bindings[action]);
             }
         }
-        #endregion
-
-        #region Methods
 
         public static void ResetBindingsToDefault()
         {
@@ -185,9 +160,16 @@ namespace Halves_of_Tria.Classes
             AddActionBinding(_defaultMouseBindings);
             AddActionBinding(_defaultGamepadBindings);
         }
+        #endregion
 
-
-        public static bool IsActionHeld(InputAction action)
+        #region Action Input Methods
+        /// <summary>
+        /// Returns whether any key bound to the specified action is down in the current state. 
+        /// </summary>
+        /// <param name="action">The action to check.</param>
+        /// <returns><see langword="true"/> if any key bound to the action is down this state; 
+        /// otherwise, <see langword="false"/>.</returns>
+        public static bool IsActionDown(InputAction action)
         {
             KeyboardStateExtended keyboardState = KeyboardExtended.GetState();
             MouseStateExtended mouseState = MouseExtended.GetState();
@@ -218,22 +200,105 @@ namespace Halves_of_Tria.Classes
             return false;
         }
 
-        public static bool WasActionHeld(InputAction action)
+        /// <summary>
+        /// Returns whether any key bound to the specified action was up during the previous state, but is now down. 
+        /// </summary>
+        /// <param name="action">The action to check.</param>
+        /// <returns><see langword="true"/> if any key bound to the action was pressed this state and not in the previous state; 
+        /// otherwise, <see langword="false"/>.</returns>
+        public static bool WasActionJustPressed(InputAction action)
         {
-            // [todo]
+            KeyboardStateExtended keyboardState = KeyboardExtended.GetState();
+            MouseStateExtended mouseState = MouseExtended.GetState();
 
+            foreach (Keys key in _keyboardBindings[action])
+            {
+                if (keyboardState.WasKeyPressed(key))
+                {
+                    return true;
+                }
+            }
 
+            foreach (MouseButton button in _mouseBindings[action])
+            {
+                if (mouseState.WasButtonPressed(button))
+                {
+                    return true;
+                }
+            }
+
+            foreach (Buttons button in _gamepadBindings[action])
+            {
+                if (!IsGamepadInputActivated(_previousGamepadState, button)
+                    && IsGamepadInputActivated(_gamepadState, button))
+                {
+                    return true;
+                }
+            }
             return false;
         }
 
-        // [todo: add "WasActionJustPressed" and "WasActionJustReleased" methods]
+        /// <summary>
+        /// Returns whether any key bound to the specified action was down during the previous state, but is now up. 
+        /// </summary>
+        /// <param name="action">The action to check.</param>
+        /// <returns><see langword="true"/> if any key bound to the action was released this state and not in the previous state; 
+        /// otherwise, <see langword="false"/>.</returns>
+        public static bool WasActionJustReleased(InputAction action)
+        {
+            KeyboardStateExtended keyboardState = KeyboardExtended.GetState();
+            MouseStateExtended mouseState = MouseExtended.GetState();
 
+            foreach (Keys key in _keyboardBindings[action])
+            {
+                if (keyboardState.WasKeyReleased(key))
+                {
+                    return true;
+                }
+            }
 
+            foreach (MouseButton button in _mouseBindings[action])
+            {
+                if (mouseState.WasButtonReleased(button))
+                {
+                    return true;
+                }
+            }
+
+            foreach (Buttons button in _gamepadBindings[action])
+            {
+                if (IsGamepadInputActivated(_previousGamepadState, button)
+                    &&!IsGamepadInputActivated(_gamepadState, button))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         #endregion
 
-
         #region Helper Methods
+        /// <summary>
+        /// Initializes the action dictionaries with empty lists for each action.
+        /// </summary>
+        private static void InitializeBindingDictionaries()
+        {
+            foreach (InputAction action in Enum.GetValues(typeof(InputAction)).Cast<InputAction>())
+            {
+                _keyboardBindings[action] = new List<Keys>();
+                _mouseBindings[action] = new List<MouseButton>();
+                _gamepadBindings[action] = new List<Buttons>();
+            }
+        }
 
+        /// <summary>
+        /// Determines whether the specified gamepad button or control is currently activated in the given gamepad
+        /// state.
+        /// </summary>
+        /// <param name="state">The current state of the gamepad to evaluate.</param>
+        /// <param name="button">The button or control to check for activation.</param>
+        /// <returns>true if the specified button, trigger, or thumbstick direction is activated in the provided gamepad state;
+        /// otherwise, false.</returns>
         private static bool IsGamepadInputActivated(GamePadState state, Buttons button)
         {
             return IsGamepadButtonDown(state, button) ||
@@ -246,7 +311,7 @@ namespace Halves_of_Tria.Classes
         /// </summary>
         /// <param name="state">The current state of the gamepad.</param>
         /// <param name="button">The gamepad button to check.</param>
-        /// <returns>True if the given gamepad button is pressed; otherwise, false.</returns>
+        /// <returns>true if the given gamepad button is pressed; otherwise, false.</returns>
         private static bool IsGamepadButtonDown(GamePadState state, Buttons button)
         {
             return button switch
@@ -270,6 +335,15 @@ namespace Halves_of_Tria.Classes
             };
         }
 
+        /// <summary>
+        /// Determines whether the specified trigger button on the gamepad is currently pressed beyond the configured
+        /// deadzone.
+        /// </summary>
+        /// <remarks>This method only evaluates trigger buttons. For other button types, the method always
+        /// returns false.</remarks>
+        /// <param name="state">The current state of the gamepad to evaluate.</param>
+        /// <param name="button">The trigger button to check. Must be either Buttons.LeftTrigger or Buttons.RightTrigger.</param>
+        /// <returns>true if the specified trigger is pressed beyond the deadzone threshold; otherwise, false.</returns>
         private static bool IsGamepadTriggerDown(GamePadState state, Buttons button)
         {
             return button switch
@@ -280,6 +354,18 @@ namespace Halves_of_Tria.Classes
             };
         }
 
+        /// <summary>
+        /// Determines whether the specified thumbstick on a gamepad is moved in the given direction beyond the
+        /// configured deadzone.
+        /// </summary>
+        /// <remarks>This method only evaluates thumbstick direction buttons. For other button values, the
+        /// method returns false. The deadzone threshold is used to prevent minor thumbstick movements from being
+        /// registered as directional input.</remarks>
+        /// <param name="state">The current state of the gamepad, including thumbstick positions.</param>
+        /// <param name="button">The thumbstick direction to check. Must be one of the directional thumbstick button values (e.g.,
+        /// LeftThumbstickUp, RightThumbstickLeft).</param>
+        /// <returns>true if the specified thumbstick is moved in the given direction beyond the deadzone threshold; otherwise,
+        /// false.</returns>
         private static bool IsGamepadThumbstickDirection(GamePadState state, Buttons button)
         {
             return button switch

@@ -69,10 +69,10 @@ namespace Halves_of_Tria
         {
             InputManager.Update();
 
-            if (InputManager.IsActionHeld(InputAction.QuickQuit))
+            // [Todo: couple each InputAction to some code representing what it does in-game rather than hardcoding it here]
+            if (InputManager.WasActionJustPressed(InputAction.QuickQuit))
                 Exit();
 
-            // Update all systems
             TransformSystem.Update(gameTime);
             SpriteSystem.Update(gameTime);
 
