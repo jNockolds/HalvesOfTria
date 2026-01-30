@@ -6,10 +6,17 @@ using Halves_of_Tria.Classes.Components;
 
 namespace Halves_of_Tria.Classes
 {
-    class System<T> where T : Component
+    /// <summary>
+    /// Provides a base class for managing and updating a collection of components of a specified type.
+    /// </summary>
+    internal class System<T> where T : Component
     {
         protected static List<T> Components = new List<T>();
 
+        /// <summary>
+        /// Registers the specified component with the component collection.
+        /// </summary>
+        /// <param name="component">The component instance to register. Cannot be null.</param>
         public static void Register(T component)
         {
             Components.Add(component);

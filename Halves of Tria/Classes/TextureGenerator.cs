@@ -7,11 +7,11 @@ namespace Halves_of_Tria.Classes
     /// <summary>
     /// A utility class for generating simple textures such as rectangles, squares, and circles.
     /// </summary>
-    public static class TextureGenerator
+    internal static class TextureGenerator
     {
         #region Public Methods
         /// <summary>
-        /// Generates semiMajorAxis rectangular texture with the specified dimensions, color, and style.
+        /// Generates an axis-aligned rectangular texture with the specified dimensions, color, and style.
         /// </summary>
         /// <remarks>For unfilled rectangles, the border is drawn with the specified thickness.</remarks>
         /// <param name="graphicsDevice">The graphics device used to create the texture.</param>
@@ -57,7 +57,7 @@ namespace Halves_of_Tria.Classes
         }
 
         /// <summary>
-        /// Generates semiMajorAxis square texture with the specified side length, color, and style.
+        /// Generates an axis-aligned square texture with the specified side length, color, and style.
         /// </summary>
         /// <remarks>For unfilled squares, the border is drawn with the specified thickness.</remarks>
         /// <param name="graphicsDevice">The graphics device used to create the texture.</param>
@@ -78,7 +78,7 @@ namespace Halves_of_Tria.Classes
 
 
         /// <summary>
-        /// Generates an ellipse texture with the specified width, height, colour, and style.
+        /// Generates an axis-aligned ellipse texture with the specified width, height, colour, and style.
         /// </summary>
         /// <remarks>For unfilled ellipses, the border is drawn with the specified thickness.</remarks>
         /// <param name="graphicsDevice">The graphics device used to create the texture.</param>
@@ -148,55 +148,8 @@ namespace Halves_of_Tria.Classes
             }
         }
 
-        private static void MapUnfilledEllipse(Color[] flatPixelColours, int width, int height, Color colour, int thickness)
-        {
-            int totalPixels = width * height;
-            float semiMajorAxis = width / 2f;
-            float semiMinorAxis = height / 2f;
-            float centreX = semiMajorAxis;
-            float centreY = semiMinorAxis;
-
-            // Inner ellipse approximation: shrink each semi-axis by thickness.
-            // If the thickness is large enough to collapse the inner ellipse, we treat the inner ellipse as degenerate.
-            float innerA = Math.Max(0f, semiMajorAxis - thickness);
-            float innerB = Math.Max(0f, semiMinorAxis - thickness);
-
-            float invA2 = 1f / (semiMajorAxis * semiMajorAxis);
-            float invB2 = 1f / (semiMinorAxis * semiMinorAxis);
-            float invIA2 = innerA > 0f ? 1f / (innerA * innerA) : float.PositiveInfinity;
-            float invIB2 = innerB > 0f ? 1f / (innerB * innerB) : float.PositiveInfinity;
-
-            for (int i = 0; i < totalPixels; i++)
-            {
-                int x = i % width;
-                int y = i / width;
-
-                float dx = (x + 0.5f) - centreX;
-                float dy = (y + 0.5f) - centreY;
-
-                float outerE = (dx * dx) * invA2 + (dy * dy) * invB2;
-                bool insideOuter = outerE <= 1f;
-
-                bool outsideInner;
-                if (innerA <= 0f || innerB <= 0f)
-                {
-                    // inner ellipse collapsed; treat insideInner as false so border fills the whole ellipse
-                    outsideInner = true;
-                }
-                else
-                {
-                    float innerE = (dx * dx) * invIA2 + (dy * dy) * invIB2;
-                    outsideInner = innerE >= 1f;
-                }
-
-                flatPixelColours[i] = (insideOuter && outsideInner) ? colour : Color.Transparent;
-            }
-        }
-
-
-
         /// <summary>
-        /// Generates semiMajorAxis circle texture with the specified radius, color, and style.
+        /// Generates a circle texture with the specified radius, color, and style.
         /// </summary>
         /// <remarks>For unfilled circles, the border is drawn with the specified thickness.</remarks>
         /// <param name="graphicsDevice">The graphics device used to create the texture.</param>
@@ -320,6 +273,52 @@ namespace Halves_of_Tria.Classes
         {
             float distanceSquared = ((radius - x - 0.5f) * (radius - x - 0.5f)) + ((radius - y - 0.5f) * (radius - y - 0.5f));
             return (distanceSquared <= radius * radius) && (distanceSquared >= (radius - thickness) * (radius - thickness));
+        }
+
+
+        private static void MapUnfilledEllipse(Color[] flatPixelColours, int width, int height, Color colour, int thickness)
+        {
+            int totalPixels = width * height;
+            float semiMajorAxis = width / 2f;
+            float semiMinorAxis = height / 2f;
+            float centreX = semiMajorAxis;
+            float centreY = semiMinorAxis;
+
+            // Inner ellipse approximation: shrink each semi-axis by thickness.
+            // If the thickness is large enough to collapse the inner ellipse, we treat the inner ellipse as degenerate.
+            float innerA = Math.Max(0f, semiMajorAxis - thickness);
+            float innerB = Math.Max(0f, semiMinorAxis - thickness);
+
+            float invA2 = 1f / (semiMajorAxis * semiMajorAxis);
+            float invB2 = 1f / (semiMinorAxis * semiMinorAxis);
+            float invIA2 = innerA > 0f ? 1f / (innerA * innerA) : float.PositiveInfinity;
+            float invIB2 = innerB > 0f ? 1f / (innerB * innerB) : float.PositiveInfinity;
+
+            for (int i = 0; i < totalPixels; i++)
+            {
+                int x = i % width;
+                int y = i / width;
+
+                float dx = (x + 0.5f) - centreX;
+                float dy = (y + 0.5f) - centreY;
+
+                float outerE = (dx * dx) * invA2 + (dy * dy) * invB2;
+                bool insideOuter = outerE <= 1f;
+
+                bool outsideInner;
+                if (innerA <= 0f || innerB <= 0f)
+                {
+                    // inner ellipse collapsed; treat insideInner as false so border fills the whole ellipse
+                    outsideInner = true;
+                }
+                else
+                {
+                    float innerE = (dx * dx) * invIA2 + (dy * dy) * invIB2;
+                    outsideInner = innerE >= 1f;
+                }
+
+                flatPixelColours[i] = (insideOuter && outsideInner) ? colour : Color.Transparent;
+            }
         }
         #endregion
     }

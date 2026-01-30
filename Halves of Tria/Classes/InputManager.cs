@@ -7,7 +7,10 @@ using MonoGame.Extended.Input;
 
 namespace Halves_of_Tria.Classes
 {
-    public enum InputAction
+    /// <summary>
+    /// Specifies the set of possible input actions recognized by the game.
+    /// </summary>
+    internal enum InputAction
     {
         SaltWalkLeft,
         SaltWalkRight,
@@ -17,11 +20,11 @@ namespace Halves_of_Tria.Classes
     }
 
     /// <summary>
-    /// Responsible for managing input actions.
-    /// It provides functionality to bind keys to specific actions and check their states
+    /// Responsible for managing input actions,
+    /// provides functionality to bind keys to specific actions and check their states
     /// (i.e. whether an action is being held, was just pressed, or was just released).
     /// </summary>
-    public static class InputManager
+    internal static class InputManager
     {
         #region Fields
         private static readonly float _gamepadDeadzone = 0.2f;
@@ -84,6 +87,11 @@ namespace Halves_of_Tria.Classes
         #endregion
 
         #region Binding Methods
+        /// <summary>
+        /// Binds a keyboard key to the specified input action.
+        /// </summary>
+        /// <param name="action">The input action to which the keyboard key will be bound.</param>
+        /// <param name="button">The keyboard key to bind to the specified action.</param>
         public static void AddActionBinding(InputAction action, Keys button)
         {
             if (!_keyboardBindings[action].Contains(button))
@@ -92,6 +100,11 @@ namespace Halves_of_Tria.Classes
             }
         }
 
+        /// <summary>
+        /// Binds a mouse button to the specified input action.
+        /// </summary>
+        /// <param name="action">The input action to which the mouse button will be bound.</param>
+        /// <param name="button">The mouse button to bind to the specified action.</param>
         public static void AddActionBinding(InputAction action, MouseButton button)
         {
             if (!_mouseBindings[action].Contains(button))
@@ -100,6 +113,12 @@ namespace Halves_of_Tria.Classes
             }
         }
 
+        /// <summary>
+        /// Binds a gamepad button to the specified input action.
+        /// </summary>
+        /// <remarks>Note that "button" can refer to standard buttons, triggers, or thumbstick directions.</remarks>
+        /// <param name="action">The input action to which the gamepad button will be bound.</param>
+        /// <param name="button">The gamepad button to bind to the specified action.</param>
         public static void AddActionBinding(InputAction action, Buttons button)
         {
             if (!_gamepadBindings[action].Contains(button))
@@ -108,6 +127,11 @@ namespace Halves_of_Tria.Classes
             }
         }
 
+        /// <summary>
+        /// Binds an enumerable of keyboard keys to the specified input action.
+        /// </summary>
+        /// <param name="action">The input action to which the keyboard keys will be bound.</param>
+        /// <param name="buttons">An enumerable of the keyboard keys to bind to the specified action.</param>
         public static void AddActionBinding(InputAction action, IEnumerable<Keys> buttons)
         {
             foreach (Keys button in buttons)
@@ -115,6 +139,12 @@ namespace Halves_of_Tria.Classes
                 AddActionBinding(action, button);
             }
         }
+
+        /// <summary>
+        /// Binds an enumerable of mouse buttons to the specified input action.
+        /// </summary>
+        /// <param name="action">The input action to which the mouse buttons will be bound.</param>
+        /// <param name="buttons">An enumerable of the mouse buttons to bind to the specified action.</param>
         public static void AddActionBinding(InputAction action, IEnumerable<MouseButton> buttons)
         {
             foreach (MouseButton button in buttons)
@@ -123,6 +153,12 @@ namespace Halves_of_Tria.Classes
             }
         }
 
+        /// <summary>
+        /// Binds an enumerable of gamepad buttons to the specified input action.
+        /// </summary>
+        /// <remarks>Note that "button" can refer to standard buttons, triggers, or thumbstick directions.</remarks>
+        /// <param name="action">The input action to which the gamepad buttons will be bound.</param>
+        /// <param name="buttons">An enumerable of the gamepad buttons to bind to the specified action.</param>
         public static void AddActionBinding(InputAction action, IEnumerable<Buttons> buttons)
         {
             foreach (Buttons button in buttons)
@@ -131,6 +167,11 @@ namespace Halves_of_Tria.Classes
             }
         }
 
+        /// <summary>
+        /// Binds multiple input actions to keyboard keys using the specified dictionary of actions and their associated keyboard key lists.
+        /// </summary>
+        /// <param name="bindings">A dictionary that maps each input action to a list of keyboard keys to bind. Each key in the dictionary represents an
+        /// action, and its associated list contains the keyboard keys that will trigger that action. Cannot be null.</param>
         public static void AddActionBinding(Dictionary<InputAction, List<Keys>> bindings)
         {
             foreach (InputAction action in bindings.Keys)
@@ -139,6 +180,11 @@ namespace Halves_of_Tria.Classes
             }
         }
 
+        /// <summary>
+        /// Binds multiple input actions to mouse buttons using the specified dictionary of actions and their associated mouse button lists.
+        /// </summary>
+        /// <param name="bindings">A dictionary that maps each input action to a list of mouse buttons to bind. Each key in the dictionary represents an
+        /// action, and its associated list contains the mouse buttons that will trigger that action. Cannot be null.</param>
         public static void AddActionBinding(Dictionary<InputAction, List<MouseButton>> bindings)
         {
             foreach (InputAction action in bindings.Keys)
@@ -146,6 +192,13 @@ namespace Halves_of_Tria.Classes
                 AddActionBinding(action, bindings[action]);
             }
         }
+
+        /// <summary>
+        /// Binds multiple input actions to gamepad buttons using the specified dictionary of actions and their associated gamepad button lists.
+        /// </summary>
+        /// <remarks>Note that "button" can refer to standard buttons, triggers, or thumbstick directions.</remarks>
+        /// <param name="bindings">A dictionary that maps each input action to a list of gamepad buttons to bind. Each key in the dictionary represents an
+        /// action, and its associated list contains the gamepad buttons that will trigger that action. Cannot be null.</param>
         public static void AddActionBinding(Dictionary<InputAction, List<Buttons>> bindings)
         {
             foreach (InputAction action in bindings.Keys)
@@ -154,8 +207,27 @@ namespace Halves_of_Tria.Classes
             }
         }
 
+        /// <summary>
+        /// Clears all current input bindings for keyboard, mouse, and gamepad.
+        /// </summary>
+        /// <remarks>This clears the dictionaries that map input actions to their associated keys/buttons, 
+        /// and then re-initializes them with <see cref="InputAction"/> keys and empty <see cref="System.Collections.Generic.List{T}"/> values.</remarks>
+        public static void ClearAllBindings()
+        {
+            _keyboardBindings.Clear();
+            _mouseBindings.Clear();
+            _gamepadBindings.Clear();
+
+            InitializeBindingDictionaries();
+        }
+
+        /// <summary>
+        /// Resets all input bindings for keyboard, mouse, and gamepad to their defaults, removing any non-default bindings.
+        /// </summary>
         public static void ResetBindingsToDefault()
         {
+            ClearAllBindings();
+
             AddActionBinding(_defaultKeyboardBindings);
             AddActionBinding(_defaultMouseBindings);
             AddActionBinding(_defaultGamepadBindings);

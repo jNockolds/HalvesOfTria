@@ -2,7 +2,10 @@
 
 namespace Halves_of_Tria.Classes
 {
-    class Component
+    /// <summary>
+    /// Represents a modular unit of behavior that can be attached to an <see cref="Halves_of_Tria.Classes.Entity"/>.
+    /// </summary>
+    internal class Component
     {
         public Entity Entity;
 

@@ -3,7 +3,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Halves_of_Tria.Classes.Components
 {
-    class Sprite : Component
+    /// <summary>
+    /// Represents a 2D sprite component that can be rendered with a specified texture and transform.
+    /// </summary>
+    /// <remarks>A Sprite must be attached to an entity with a Transform component to determine its position,
+    /// rotation, scale, and layer depth during rendering. Sprites are drawn in order based on their layer 
+    /// depth, with lower values appearing above higher ones.</remarks>
+    internal class Sprite : Component
     {
         #region Fields
         private Texture2D Texture;
@@ -30,6 +36,12 @@ namespace Halves_of_Tria.Classes.Components
 
 
         #region Methods
+        /// <summary>
+        /// Submits the sprite to the specified sprite batch, using the entity's current transform.
+        /// </summary>
+        /// <remarks>The sprite is drawn centered on its texture.
+        /// Call this method within a SpriteBatch.Begin() SpriteBatch.End() block.</remarks>
+        /// <param name="spriteBatch">The sprite batch used to render the sprite. Cannot be null.</param>
         public void Draw(SpriteBatch spriteBatch)
         {
             Transform transform = Entity.GetComponent<Transform>();

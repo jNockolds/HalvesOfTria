@@ -5,7 +5,10 @@ using Halves_of_Tria.Classes;
 
 namespace Halves_of_Tria.Classes.Entities
 {
-    class Salt : Entity
+    /// <summary>
+    /// Represents the primary player character, Salt.
+    /// </summary>
+    internal class Salt : Entity
     {
         public Salt(Vector2 initialPosition, Texture2D texture)
         {
