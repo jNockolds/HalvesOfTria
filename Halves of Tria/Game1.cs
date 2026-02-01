@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.ECS;
-using MonoGame.Extended.ECS.Systems;
-using MonoGame.Extended.Graphics;
 using MonoGame.Extended;
 using Halves_of_Tria.Classes;
 using Halves_of_Tria.Systems;

@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-
-namespace Halves_of_Tria.Components
+﻿namespace Halves_of_Tria.Components
 {
     internal class Speed
     {
