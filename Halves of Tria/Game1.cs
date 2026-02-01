@@ -1,9 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.ECS;
+using MonoGame.Extended.ECS.Systems;
+using MonoGame.Extended.Graphics;
+using MonoGame.Extended;
 using Halves_of_Tria.Classes;
-using Halves_of_Tria.Classes.Entities;
-using MonoGame.Extended.Input;
+using Halves_of_Tria.Systems;
+using Halves_of_Tria.Input;
+using Halves_of_Tria.Components;
 
 namespace Halves_of_Tria
 {
@@ -31,11 +36,12 @@ namespace Halves_of_Tria
         #endregion
 
         #region Fields
+        // Class level definition
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private Texture2D _saltTexture;
-        private Salt _salt;
+        private World _world;
+        private Entity playerEntity;
         #endregion
 
 
@@ -60,9 +66,17 @@ namespace Halves_of_Tria
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            _saltTexture = TextureGenerator.GenerateRectangleTexture(GraphicsDevice, 40, 120, Color.White, true);
+            _world = new WorldBuilder()
+            .AddSystem(new PlayerSystem())
+            .AddSystem(new RenderSystem(_spriteBatch))
+            .Build();
+
             Vector2 saltInitialPosition = new Vector2(WindowWidth / 2, WindowHeight / 2);
-            _salt = new Salt(saltInitialPosition, _saltTexture);
+            Texture2D saltTexture = TextureGenerator.GenerateRectangleTexture(GraphicsDevice, 40, 120, Color.White, true);
+
+            playerEntity = _world.CreateEntity();
+            playerEntity.Attach(saltTexture);
+            playerEntity.Attach(new Player(100, saltInitialPosition));
         }
 
         protected override void Update(GameTime gameTime)
@@ -73,9 +87,8 @@ namespace Halves_of_Tria
             if (InputManager.WasActionJustPressed(InputAction.QuickQuit))
                 Exit();
 
-            TransformSystem.Update(gameTime);
-            SpriteSystem.Update(gameTime);
 
+            _world.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -83,10 +96,7 @@ namespace Halves_of_Tria
         {
             GraphicsDevice.Clear(Color.Gray);
 
-            _spriteBatch.Begin();
-            SpriteSystem.Draw(_spriteBatch);
-            _spriteBatch.End();
-
+            _world.Draw(gameTime);
             base.Draw(gameTime);
         }
     }

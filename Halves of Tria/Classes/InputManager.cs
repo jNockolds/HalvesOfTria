@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Input;
 
-namespace Halves_of_Tria.Classes
+namespace Halves_of_Tria.Input
 {
     /// <summary>
     /// Specifies the set of possible input actions recognized by the game.
