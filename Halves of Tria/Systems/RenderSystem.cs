@@ -12,10 +12,10 @@ namespace Halves_of_Tria.Systems
     {
         private readonly SpriteBatch _spriteBatch;
         private ComponentMapper<Texture2D> _textureMapper;
-        private ComponentMapper<Player> _playerMapper;
+        private ComponentMapper<Transform2> _transformMapper;
 
         public RenderSystem(SpriteBatch spriteBatch)
-            : base(Aspect.All(typeof(Texture2D), typeof(Player)))
+            : base(Aspect.All(typeof(Texture2D), typeof(Transform2)))
         {
             _spriteBatch = spriteBatch;
         }
@@ -23,7 +23,7 @@ namespace Halves_of_Tria.Systems
         public override void Initialize(IComponentMapperService mapperService)
         {
             _textureMapper = mapperService.GetMapper<Texture2D>();
-            _playerMapper = mapperService.GetMapper<Player>();
+            _transformMapper = mapperService.GetMapper<Transform2>();
         }
 
         public override void Draw(GameTime gameTime)
@@ -33,8 +33,8 @@ namespace Halves_of_Tria.Systems
             foreach (var entityId in ActiveEntities)
             {
                 var texture = _textureMapper.Get(entityId);
-                var player = _playerMapper.Get(entityId);
-                _spriteBatch.Draw(texture, player.Position, Color.White);
+                var transform = _transformMapper.Get(entityId);
+                _spriteBatch.Draw(texture, transform.Position, Color.White);
             }
 
             _spriteBatch.End();

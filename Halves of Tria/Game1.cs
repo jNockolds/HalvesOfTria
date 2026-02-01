@@ -41,7 +41,7 @@ namespace Halves_of_Tria
         private SpriteBatch _spriteBatch;
 
         private World _world;
-        private Entity playerEntity;
+        private Entity _salt;
         #endregion
 
 
@@ -67,16 +67,17 @@ namespace Halves_of_Tria
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _world = new WorldBuilder()
-            .AddSystem(new PlayerSystem())
+            .AddSystem(new SaltMovementSystem())
             .AddSystem(new RenderSystem(_spriteBatch))
             .Build();
 
             Vector2 saltInitialPosition = new Vector2(WindowWidth / 2, WindowHeight / 2);
             Texture2D saltTexture = TextureGenerator.GenerateRectangleTexture(GraphicsDevice, 40, 120, Color.White, true);
 
-            playerEntity = _world.CreateEntity();
-            playerEntity.Attach(saltTexture);
-            playerEntity.Attach(new Player(100, saltInitialPosition));
+            _salt = _world.CreateEntity();
+            _salt.Attach(saltTexture);
+            _salt.Attach(new Transform2(saltInitialPosition));
+            _salt.Attach(new Speed(200));
         }
 
         protected override void Update(GameTime gameTime)
