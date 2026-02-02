@@ -58,8 +58,8 @@ namespace Halves_of_Tria
             WindowWidth = 1280;
             WindowHeight = 720;
             InputManager.Initialize();
+            JsonLoader.Initialize();
             base.Initialize();
-            JsonLoader.LoadConfig();
 
 
             Debug.WriteLine("~ ~ ~ ~ ~ ~");
@@ -69,6 +69,8 @@ namespace Halves_of_Tria
 
             Config.GravitationalAcceleration = new Vector2(0, 9.81f);
             Debug.WriteLine("Gravitational Acceleration set to: " + Config.GravitationalAcceleration);
+            Config.TestProperty = "This is a test.";
+            Debug.WriteLine("Test Property set to: " + Config.TestProperty);
             Debug.WriteLine("~ ~ ~ ~ ~ ~");
         }
 
