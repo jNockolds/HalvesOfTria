@@ -21,13 +21,10 @@ namespace Halves_of_Tria.Configuration
 
         public static void SetGravitationalAcceleration(Vector2 newValue)
         {
-            Config.GravitationalAcceleration = newValue;
-
             string jsonString = File.ReadAllText(Config.filePath);
 
             var jsonNode = JsonNode.Parse(jsonString);
 
-            Debug.WriteLine(@"jsonNode[""GravitationalAcceleration""]: " + jsonNode["GravitationalAcceleration"]);
             jsonNode["GravitationalAcceleration"] = newValue.Y;
 
             File.WriteAllText(Config.filePath, jsonNode.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
@@ -45,7 +42,16 @@ namespace Halves_of_Tria.Configuration
         // it steps back from bin/Debug/net8.0 to the project root directory using "..", "..", ".."
         public static readonly string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "JSON", "Config.json");
 
-        public static Vector2 GravitationalAcceleration { get; set; }
+        private static Vector2 _gravitationalAcceleration;
+        public static Vector2 GravitationalAcceleration
+        {
+            get => _gravitationalAcceleration;
+            set
+            {
+                _gravitationalAcceleration = value;
+                JsonLoader.SetGravitationalAcceleration(value);
+            }
+        }
         public static string TestProperty { get; set; }
     }
 }

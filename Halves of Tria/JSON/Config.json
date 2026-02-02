@@ -1,4 +1,4 @@
 {
-  "GravitationalAcceleration": 20,
+  "GravitationalAcceleration": 9.8,
   "TestProperty": "TestValue"
 }

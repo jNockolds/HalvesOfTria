@@ -63,12 +63,12 @@ namespace Halves_of_Tria
 
 
             Debug.WriteLine("~ ~ ~ ~ ~ ~");
-            Debug.WriteLine("Gravitational Acceleration set to: " + Configuration.Config.GravitationalAcceleration);
+            Debug.WriteLine("Gravitational Acceleration set to: " + Config.GravitationalAcceleration);
             Debug.WriteLine("Test Property set to: " + Config.TestProperty);
             Debug.WriteLine("~ ~ ~ ~ ~ ~");
 
-            JsonLoader.SetGravitationalAcceleration(new Vector2(0, 9.81f));
-            Debug.WriteLine("Gravitational Acceleration set to: " + Configuration.Config.GravitationalAcceleration);
+            Config.GravitationalAcceleration = new Vector2(0, 9.81f);
+            Debug.WriteLine("Gravitational Acceleration set to: " + Config.GravitationalAcceleration);
             Debug.WriteLine("~ ~ ~ ~ ~ ~");
         }
 
