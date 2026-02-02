@@ -7,6 +7,9 @@
 ## Roadmap
 This roadmap serves as initial guidelines and progress tracking for this project. As such, it may change over time. Also, each stage will gain more details as the project progresses, outlining the stage's key features and goals.
 
+## To Do
+- Start "Tweak JSON During Runtime (Debug)" feature.
+
 ### Stage Summaries
 
 | #   | Name                                              | Status      | Date Completed |
@@ -43,16 +46,13 @@ This roadmap serves as initial guidelines and progress tracking for this project
 
 A good foundation from which to code the rest of the game, including an Entity Component system; input handling for keyboard and mouse, as well as gamepads; the ability to read and write variables to and from JSON files (for convenience while tweaking values while the game is running); and a way to use unit tests to test methods.
 
-#### To Do
-- Start "JSON Reading and Writing to Variables" feature.
-
 #### Key Features
 
 | Name                                  | End Goal                                                                                                                                                                         | Status      | Date Completed |
 | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------------- |
 | Entity Component System               | A well-structured object-oriented code structure, with entities, entity components, and systems that act on all entities with components they govern. Each entity should only contain components, not other code (if other code is needed, make a component instead). Each system should be what runs most of the code.                                                                                                                                       | Completed   | 01/02/2026     |
 | Input Handling                        | Input handling for keyboard and mouse and gamepads, with methods for key pressing/clicking,  holding, and releasing, and the ability to map each input to a labelled action.     | Completed   | 29/01/2026     |
-| JSON Reading and Writing to Variables | Some abstract class containing global variables, with methods that allow someone to read and write directly to JSON.                                                             | In Progress |                |
+| JSON Reading and Writing to Variables | Some abstract class containing global variables, with methods that allow someone to read and write directly to JSON.                                                             | Completed   | 02/02/2026     |
 | Tweak JSON During Runtime (Debug)     | During runtime, it's possible to, with a keypress, it's possible to search for a variable (in the above global abstract class) and, if it's found, change its value. The input will need to be parsed from a string to the type of the variable.                                                                                                                                                                                                                  | Not Started |                |
 | Testing                               | A way for code to be tested while debugging (ideally, tests won't run when outside of debugging).                                                                                | Not Started |                |
 
