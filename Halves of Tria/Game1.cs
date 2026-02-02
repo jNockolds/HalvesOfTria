@@ -2,11 +2,13 @@
 using Halves_of_Tria.Input;
 using Halves_of_Tria.PrimitiveTextures;
 using Halves_of_Tria.Systems;
+using Halves_of_Tria.Config;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using System.Diagnostics;
+
 
 namespace Halves_of_Tria
 {
@@ -63,6 +65,10 @@ namespace Halves_of_Tria
             Debug.WriteLine("~ ~ ~ ~ ~ ~");
             Debug.WriteLine("Gravitational Acceleration set to: " + Config.Config.GravitationalAcceleration);
             Debug.WriteLine("Test Property set to: " + Config.Config.TestProperty);
+            Debug.WriteLine("~ ~ ~ ~ ~ ~");
+
+            Config.JsonLoader.SetGravitationalAcceleration(new Vector2(0, 980f));
+            Debug.WriteLine("Gravitational Acceleration set to: " + Config.Config.GravitationalAcceleration);
             Debug.WriteLine("~ ~ ~ ~ ~ ~");
         }
 
