@@ -18,6 +18,11 @@
     <None Remove="Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="JSON\Config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Icon.ico">
       <LogicalName>Icon.ico</LogicalName>
     </EmbeddedResource>

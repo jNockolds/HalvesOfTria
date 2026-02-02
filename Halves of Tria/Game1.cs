@@ -1,11 +1,12 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.ECS;
-using MonoGame.Extended;
-using Halves_of_Tria.Classes;
-using Halves_of_Tria.Systems;
+﻿using Halves_of_Tria.Components;
 using Halves_of_Tria.Input;
-using Halves_of_Tria.Components;
+using Halves_of_Tria.PrimitiveTextures;
+using Halves_of_Tria.Systems;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
+using MonoGame.Extended.ECS;
+using System.Diagnostics;
 
 namespace Halves_of_Tria
 {
@@ -54,9 +55,15 @@ namespace Halves_of_Tria
         {
             WindowWidth = 1280;
             WindowHeight = 720;
-
             InputManager.Initialize();
             base.Initialize();
+            Config.JsonLoader.LoadConfig();
+
+
+            Debug.WriteLine("~ ~ ~ ~ ~ ~");
+            Debug.WriteLine("Gravitational Acceleration set to: " + Config.Config.GravitationalAcceleration);
+            Debug.WriteLine("Test Property set to: " + Config.Config.TestProperty);
+            Debug.WriteLine("~ ~ ~ ~ ~ ~");
         }
 
         protected override void LoadContent()
