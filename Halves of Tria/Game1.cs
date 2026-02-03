@@ -60,18 +60,6 @@ namespace Halves_of_Tria
             InputManager.Initialize();
             JsonLoader.Initialize();
             base.Initialize();
-
-
-            Debug.WriteLine("~ ~ ~ ~ ~ ~");
-            Debug.WriteLine("Gravitational Acceleration set to: " + Config.GravitationalAcceleration);
-            Debug.WriteLine("Test Property set to: " + Config.TestProperty);
-            Debug.WriteLine("~ ~ ~ ~ ~ ~");
-
-            Config.GravitationalAcceleration = new Vector2(0, 9.81f);
-            Debug.WriteLine("Gravitational Acceleration set to: " + Config.GravitationalAcceleration);
-            Config.TestProperty = "This is a test.";
-            Debug.WriteLine("Test Property set to: " + Config.TestProperty);
-            Debug.WriteLine("~ ~ ~ ~ ~ ~");
         }
 
         protected override void LoadContent()

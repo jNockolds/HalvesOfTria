@@ -15,6 +15,10 @@ namespace Halves_of_Tria.Configuration
             LoadConfig();
         }
 
+        /// <summary>
+        /// Loads the configuration from the JSON config file and assigns values to <see cref="Config"/>'s properties.
+        /// </summary>
+        /// <remarks>When adding new properties to the config, ensure to update this method accordingly.</remarks>
         public static void LoadConfig()
         {
             string jsonString = File.ReadAllText(Config.filePath);
@@ -34,7 +38,13 @@ namespace Halves_of_Tria.Configuration
             Config.TestProperty = coinfigJson.TestProperty;
         }
 
-        public static void SetValue<T>(string propertyName, T newValue)
+        /// <summary>
+        /// Sets a value in the JSON config file for the specified property name.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="newValue"></param>
+        public static void SetJsonValue<T>(string propertyName, T newValue)
         {
             string jsonString = File.ReadAllText(Config.filePath);
             var jsonNode = JsonNode.Parse(jsonString);
@@ -45,14 +55,17 @@ namespace Halves_of_Tria.Configuration
             );
         }
 
-        private class ConfigJson
+        private struct ConfigJson
         {
             public Dictionary<string, float> GravitationalAcceleration { get; set; }
             public string TestProperty { get; set; }
         }
     }
 
-    internal static class Config
+    /// <summary>
+    /// Stores configuration properties loaded from the JSON config file.
+    /// </summary>
+    internal struct Config
     {
         // it steps back from bin/Debug/net8.0 to the project root directory using "..", "..", ".."
         public static readonly string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "JSON", "Config.json");
@@ -65,7 +78,7 @@ namespace Halves_of_Tria.Configuration
             set
             {
                 _gravitationalAcceleration = value;
-                JsonLoader.SetValue("GravitationalAcceleration", new Dictionary<string, float>
+                JsonLoader.SetJsonValue("GravitationalAcceleration", new Dictionary<string, float>
                 {
                     { "X", value.X },
                     { "Y", value.Y }
@@ -81,7 +94,7 @@ namespace Halves_of_Tria.Configuration
             set
             {
                 _testProperty = value;
-                JsonLoader.SetValue("TestProperty", value);
+                JsonLoader.SetJsonValue("TestProperty", value);
             }
         }
     }
