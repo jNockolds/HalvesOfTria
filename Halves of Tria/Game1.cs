@@ -74,6 +74,7 @@ namespace Halves_of_Tria
             Vector2 saltInitialPosition = new Vector2(WindowWidth / 2, WindowHeight / 2);
             Texture2D saltTexture = TextureGenerator.GenerateRectangleTexture(GraphicsDevice, 40, 120, Color.White, true);
 
+
             _salt = _world.CreateEntity();
             _salt.Attach(saltTexture);
             _salt.Attach(new Transform2(saltInitialPosition));
