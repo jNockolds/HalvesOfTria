@@ -1,7 +1,8 @@
 # Halves Of Tria
 
-## Libraries Used
+## Software Packages Used
 
+- [MonoGame](https://monogame.net/)
 - [MonoGame.Extended](https://www.monogameextended.net/)
 
 ## Roadmap
