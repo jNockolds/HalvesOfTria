@@ -16,7 +16,8 @@ namespace Halves_of_Tria.Input
         SaltWalkRight,
         SaltJump,
         QuickQuit,
-        SaltDebugMove
+        SaltDebugMove,
+        ReloadConfig
     }
 
     /// <summary>
@@ -47,7 +48,8 @@ namespace Halves_of_Tria.Input
             { InputAction.SaltWalkLeft, new List<Keys> { Keys.A, Keys.Left } },
             { InputAction.SaltWalkRight, new List<Keys> { Keys.D, Keys.Right } },
             { InputAction.SaltJump, new List<Keys> { Keys.W, Keys.Up, Keys.Space } },
-            { InputAction.QuickQuit, new List<Keys> { Keys.X } }
+            { InputAction.QuickQuit, new List<Keys> { Keys.X } },
+            { InputAction.ReloadConfig, new List<Keys> { Keys.OemCloseBrackets } }
         };
 
         private static Dictionary<InputAction, List<MouseButton>> _defaultMouseBindings = new()

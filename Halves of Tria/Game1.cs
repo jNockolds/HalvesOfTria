@@ -71,14 +71,14 @@ namespace Halves_of_Tria
             .AddSystem(new RenderSystem(_spriteBatch))
             .Build();
 
+
             Vector2 saltInitialPosition = new Vector2(WindowWidth / 2, WindowHeight / 2);
             Texture2D saltTexture = TextureGenerator.GenerateRectangleTexture(GraphicsDevice, 40, 120, Color.White, true);
-
 
             _salt = _world.CreateEntity();
             _salt.Attach(saltTexture);
             _salt.Attach(new Transform2(saltInitialPosition));
-            _salt.Attach(new Speed(200));
+            _salt.Attach(new Speed((int)Config.GravitationalAcceleration.X));
         }
 
         protected override void Update(GameTime gameTime)
@@ -88,6 +88,9 @@ namespace Halves_of_Tria
             // [Todo: couple each InputAction to some code representing what it does in-game rather than hardcoding it here]
             if (InputManager.WasActionJustPressed(InputAction.QuickQuit))
                 Exit();
+
+            if (InputManager.WasActionJustPressed(InputAction.ReloadConfig))
+                JsonLoader.LoadConfig();
 
 
             _world.Update(gameTime);
