@@ -92,7 +92,6 @@ namespace Halves_of_Tria
             if (InputManager.WasActionJustPressed(InputAction.ReloadConfig))
                 JsonLoader.LoadConfig();
 
-
             _world.Update(gameTime);
             base.Update(gameTime);
         }
