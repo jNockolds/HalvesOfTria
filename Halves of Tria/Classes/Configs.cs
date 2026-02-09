@@ -18,7 +18,7 @@ namespace Halves_of_Tria.Configuration
         /// <summary>
         /// Loads the configuration from the JSON config file and assigns values to <see cref="Config"/>'s properties.
         /// </summary>
-        /// <remarks>When adding new properties to the config, make sure to update this method accordingly.</remarks>
+        /// <remarks>When adding new properties to the config, make sure to Update this method accordingly.</remarks>
         public static void LoadConfig()
         {
             string jsonString = File.ReadAllText(Config.filePath);
@@ -65,7 +65,7 @@ namespace Halves_of_Tria.Configuration
     /// <summary>
     /// Stores configuration properties loaded from the JSON config file.
     /// </summary>
-    /// <remarks>When adding new properties to this class, make sure to update <see cref="JsonLoader.LoadConfig()"/> accordingly.</remarks>
+    /// <remarks>When adding new properties to this class, make sure to Update <see cref="JsonLoader.LoadConfig()"/> accordingly.</remarks>
     internal struct Config
     {
         // it steps back from bin/Debug/net8.0 to the project root directory using "..", "..", ".."

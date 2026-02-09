@@ -28,10 +28,10 @@ namespace Halves_of_Tria.Systems
         {
             _spriteBatch.Begin();
 
-            foreach (var entityId in ActiveEntities)
+            foreach (int entityId in ActiveEntities)
             {
-                var texture = _textureMapper.Get(entityId);
-                var transform = _transformMapper.Get(entityId);
+                Texture2D texture = _textureMapper.Get(entityId);
+                Transform2 transform = _transformMapper.Get(entityId);
                 _spriteBatch.Draw(texture, transform.Position, Color.White);
             }
 

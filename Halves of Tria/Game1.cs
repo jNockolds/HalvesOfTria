@@ -69,6 +69,7 @@ namespace Halves_of_Tria
             _world = new WorldBuilder()
             .AddSystem(new SaltMovementSystem())
             .AddSystem(new RenderSystem(_spriteBatch))
+            .AddSystem(new DynamicBodySystem())
             .Build();
 
 
@@ -79,7 +80,7 @@ namespace Halves_of_Tria
             _salt.Attach(saltTexture);
             _salt.Attach(new Transform2(saltInitialPosition));
             _salt.Attach(new Speed(200));
-            _salt.Attach(new DynamicBody());
+            _salt.Attach(new DynamicBody(1));
         }
 
         protected override void Update(GameTime gameTime)
