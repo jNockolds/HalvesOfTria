@@ -78,7 +78,7 @@ namespace Halves_of_Tria
             _salt = _world.CreateEntity();
             _salt.Attach(saltTexture);
             _salt.Attach(new Transform2(saltInitialPosition));
-            _salt.Attach(new Speed((int)Config.GravitationalAcceleration.X));
+            _salt.Attach(new Speed(200));
         }
 
         protected override void Update(GameTime gameTime)

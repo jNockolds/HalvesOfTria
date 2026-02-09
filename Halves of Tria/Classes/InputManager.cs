@@ -54,7 +54,6 @@ namespace Halves_of_Tria.Input
 
         private static Dictionary<InputAction, List<MouseButton>> _defaultMouseBindings = new()
         {
-            { InputAction.SaltWalkLeft, new List<MouseButton> { } },
             { InputAction.SaltDebugMove, new List<MouseButton> { MouseButton.Right } },
             { InputAction.QuickQuit, new List<MouseButton> { MouseButton.Middle } }
         };

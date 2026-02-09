@@ -4,6 +4,7 @@ using Halves_of_Tria.Components;
 using Microsoft.Xna.Framework;
 using Halves_of_Tria.Input;
 using MonoGame.Extended;
+using System.Diagnostics;
 
 namespace Halves_of_Tria.Systems
 {
@@ -23,6 +24,7 @@ namespace Halves_of_Tria.Systems
 
         public override void Process(GameTime gameTime, int entityId)
         {
+
             Transform2 transform = _transformMapper.Get(entityId);
             Speed speed = _speedMapper.Get(entityId);
 
