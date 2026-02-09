@@ -79,6 +79,7 @@ namespace Halves_of_Tria
             _salt.Attach(saltTexture);
             _salt.Attach(new Transform2(saltInitialPosition));
             _salt.Attach(new Speed(200));
+            _salt.Attach(new DynamicBody());
         }
 
         protected override void Update(GameTime gameTime)
