@@ -67,9 +67,9 @@ namespace Halves_of_Tria
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _world = new WorldBuilder()
-            .AddSystem(new SaltMovementSystem())
             .AddSystem(new RenderSystem(_spriteBatch))
             .AddSystem(new DynamicBodySystem())
+            .AddSystem(new SaltMovementSystem())
             .Build();
 
 
@@ -93,6 +93,11 @@ namespace Halves_of_Tria
 
             if (InputManager.WasActionJustPressed(InputAction.ReloadConfig))
                 JsonLoader.LoadConfig();
+
+            if (InputManager.IsActionDown(InputAction.SaltDebugMove))
+            {
+                // [Todo: implement debug movement]
+            }
 
             _world.Update(gameTime);
             base.Update(gameTime);

@@ -3,15 +3,13 @@ using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
+using Halves_of_Tria.Configuration;
+using System.Diagnostics;
 
 namespace Halves_of_Tria.Systems
 {
     internal class DynamicBodySystem : EntityUpdateSystem
     {
-        private readonly Vector2 _accelerationDueToGravity = new Vector2(0f, 9.81f); // [TODO: don't hardcode this]
-        private float _linearDragCoefficient = 0.1f; // [TODO: don't hardcode this]
-
-
         private ComponentMapper<DynamicBody> _dynamicBodyMapper;
         private ComponentMapper<Transform2> _transformMapper;
 
@@ -92,14 +90,14 @@ namespace Halves_of_Tria.Systems
 
         private Vector2 PositionDependentForces(Vector2 position, float mass)
         {
-            Vector2 gravityForce = mass * _accelerationDueToGravity;
+            Vector2 gravityForce = mass * Config.GravitationalAcceleration;
 
             return gravityForce; // [Apply any other position-dependent forces by summing them here]
         }
 
         private Vector2 VelocityDependentForces(Vector2 velocity)
         {
-            Vector2 dragForce = -_linearDragCoefficient * velocity;
+            Vector2 dragForce = -Config.DefaultLinearDragCoefficient * velocity;
             return dragForce; // [Apply any other velocity-dependent forces by summing them here]
         }
         #endregion

@@ -3,5 +3,6 @@
     "X": 0,
     "Y": 9.81
   },
+  "DefaultLinearDragCoefficient": 0.1,
   "TestProperty": "This is a test."
 }
