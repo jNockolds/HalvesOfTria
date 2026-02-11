@@ -1,8 +1,8 @@
-Halves of Tria is set in the city of Chrysopoeia, in the aftermath of a great catastrophe. Its inhabitants are trapped in a stasis caused by an imbalance of power, unable to truly die. 
+Halves of Tria is set in the city of Chrysopoeia, in the aftermath of a great catastrophe. Its inhabitants are trapped in a stasis caused by an imbalance of power; they are unable to truly die. 
 
-You play as two fallen deities simultaneously: Salt, of stability and the body, and Sulphur, of volatility and the soul. Search for your companion Mercury, the lost deity of fluidity and the mind. Together, the three of you formed Tria, a trinity of deities with a presence that resounded throughout the city.
+You simultaneously play as two fallen deities: Salt, of stability and the body, and Sulphur, of volatility and the soul. Search for your companion Mercury, the lost deity of fluidity and the mind. Together, the three of you formed Tria, a trinity of deities with a presence that resounded throughout the city.
 
-Work as a team to restore balance to the city, regain your lost divine strength, and learn the ancient art of transmutation.
+Work as a team to restore balance to the city, regain your lost divine strength, and maybe even learn the ancient art of transmutation.
 
 # Key features (planned)
 - Two player characters (controlled simultaneously)
