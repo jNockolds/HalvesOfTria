@@ -96,7 +96,9 @@ namespace Halves_of_Tria
 
             if (InputManager.IsActionDown(InputAction.SaltDebugMove))
             {
-                // [Todo: implement debug movement]
+                Vector2 mousePosition = InputManager.GetMousePosition();
+                Transform2 saltTransform = _salt.Get<Transform2>();
+                saltTransform.Position = mousePosition;
             }
 
             _world.Update(gameTime);

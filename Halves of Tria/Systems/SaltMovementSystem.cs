@@ -37,6 +37,8 @@ namespace Halves_of_Tria.Systems
             {
                 transform.Position += (float)gameTime.ElapsedGameTime.TotalSeconds * new Vector2(speed.Value, 0);
             }
+
+
         }
     }
 }
