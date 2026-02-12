@@ -7,6 +7,8 @@ using System.Collections.Generic;
 
 namespace Halves_of_Tria.Configuration
 {
+    // [TODO: use MonoGame.Extended's JSON serializer instead of System.Text.Json, since it has better support for MonoGame types like Vector2]
+
     // (*): Guide to adding a new config property:
     // 1. Add a new property to the JSON config file, with a unique name and appropriate type.
     //

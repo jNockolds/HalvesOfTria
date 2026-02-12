@@ -44,8 +44,6 @@ namespace Halves_of_Tria
         private Entity _salt;
         #endregion
 
-
-
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -53,11 +51,12 @@ namespace Halves_of_Tria
             IsMouseVisible = true;
         }
 
+        #region Game Loop Methods
         protected override void Initialize()
         {
             WindowWidth = 1280;
             WindowHeight = 720;
-            InputManager.Initialize();
+            InputHandler.Initialize();
             JsonLoader.Initialize();
             base.Initialize();
         }
@@ -85,18 +84,18 @@ namespace Halves_of_Tria
 
         protected override void Update(GameTime gameTime)
         {
-            InputManager.Update();
+            InputHandler.Update();
 
             // [Todo: couple each InputAction to some code representing what it does in-game rather than hardcoding it here]
-            if (InputManager.WasActionJustPressed(InputAction.QuickQuit))
+            if (InputHandler.WasActionJustPressed(InputAction.QuickQuit))
                 Exit();
 
-            if (InputManager.WasActionJustPressed(InputAction.ReloadConfig))
+            if (InputHandler.WasActionJustPressed(InputAction.ReloadConfig))
                 JsonLoader.LoadConfig();
 
-            if (InputManager.IsActionDown(InputAction.SaltDebugMove))
+            if (InputHandler.IsActionDown(InputAction.SaltDebugMove))
             {
-                Vector2 mousePosition = InputManager.GetMousePosition();
+                Vector2 mousePosition = InputHandler.GetMousePosition();
                 Transform2 saltTransform = _salt.Get<Transform2>();
                 saltTransform.Position = mousePosition;
             }
@@ -112,5 +111,6 @@ namespace Halves_of_Tria
             _world.Draw(gameTime);
             base.Draw(gameTime);
         }
+        #endregion
     }
 }

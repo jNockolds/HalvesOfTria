@@ -21,11 +21,11 @@ namespace Halves_of_Tria.Input
     }
 
     /// <summary>
-    /// Responsible for managing input actions,
+    /// Responsible for handling input actions,
     /// provides functionality to bind keys to specific actions and check their states
     /// (i.e. whether an action is being held, was just pressed, or was just released).
     /// </summary>
-    internal static class InputManager
+    internal static class InputHandler
     {
         #region Properties
         public static Vector2 GetMousePosition()

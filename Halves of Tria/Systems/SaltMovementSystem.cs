@@ -28,12 +28,12 @@ namespace Halves_of_Tria.Systems
             Transform2 transform = _transformMapper.Get(entityId);
             Speed speed = _speedMapper.Get(entityId);
 
-            if (InputManager.IsActionDown(InputAction.SaltWalkLeft))
+            if (InputHandler.IsActionDown(InputAction.SaltWalkLeft))
             {
                 transform.Position -= (float)gameTime.ElapsedGameTime.TotalSeconds * new Vector2(speed.Value, 0);
             }
 
-            if (InputManager.IsActionDown(InputAction.SaltWalkRight))
+            if (InputHandler.IsActionDown(InputAction.SaltWalkRight))
             {
                 transform.Position += (float)gameTime.ElapsedGameTime.TotalSeconds * new Vector2(speed.Value, 0);
             }
