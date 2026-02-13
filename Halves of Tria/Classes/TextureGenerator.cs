@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
-namespace Halves_of_Tria.PrimitiveTextures
+namespace Halves_of_Tria.Textures
 {
     /// <summary>
     /// A utility class for generating simple textures such as rectangles, squares, and circles.
@@ -10,6 +10,19 @@ namespace Halves_of_Tria.PrimitiveTextures
     internal static class TextureGenerator
     {
         #region Public Methods
+        /// <summary>
+        /// Generates a 1x1 pixel texture filled with the specified colour, using the specified graphics device.
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device used to create the texture. Cannot be null.</param>
+        /// <param name="color">The color to fill the pixel with.</param>
+        /// <returns>A <see cref="Texture2D"/> instance representing a single white pixel.</returns>
+        public static Texture2D Pixel(GraphicsDevice graphicsDevice, Color color)
+        {
+            Texture2D texture = new(graphicsDevice, 1, 1);
+            texture.SetData(new[] { color });
+            return texture;
+        }
+
         /// <summary>
         /// Generates an axis-aligned rectangular texture with the specified dimensions, color, and style.
         /// </summary>
@@ -25,7 +38,7 @@ namespace Halves_of_Tria.PrimitiveTextures
         /// <returns>A <see cref="Texture2D"/> representing the generated rectangle.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="width"/>, <paramref name="height"/>, or <paramref name="thickness"/> is less than
         /// or equal to zero.</exception>
-        public static Texture2D GenerateRectangleTexture(GraphicsDevice graphicsDevice, int width, int height, Color colour, bool isFilled = false, int thickness = 1)
+        public static Texture2D Rectangle(GraphicsDevice graphicsDevice, int width, int height, Color colour, bool isFilled = false, int thickness = 1)
         {
             if (width <= 0)
             {
@@ -70,9 +83,9 @@ namespace Halves_of_Tria.PrimitiveTextures
         /// <returns>A <see cref="Texture2D"/> representing the generated square.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="width"/>, <paramref name="height"/>, or <paramref name="thickness"/> is less than
         /// or equal to zero.</exception>
-        public static Texture2D GenerateSquareTexture(GraphicsDevice graphicsDevice, int sideLength, Color colour, bool isFilled = false, int thickness = 1)
+        public static Texture2D Square(GraphicsDevice graphicsDevice, int sideLength, Color colour, bool isFilled = false, int thickness = 1)
         {
-            return GenerateRectangleTexture(graphicsDevice, sideLength, sideLength, colour, isFilled, thickness);
+            return Rectangle(graphicsDevice, sideLength, sideLength, colour, isFilled, thickness);
         }
 
 
@@ -89,7 +102,7 @@ namespace Halves_of_Tria.PrimitiveTextures
         /// <param name="thickness">The thickness of the border for an unfilled ellipse. Ignored if isFilled is true. Must be >= 1 for unfilled.</param>
         /// <returns>A <see cref="Texture2D"/> representing the generated ellipse.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if width or height is less than or equal to zero, or thickness is less than one for an unfilled ellipse.</exception>
-        public static Texture2D GenerateEllipseTexture(
+        public static Texture2D Ellipse(
             GraphicsDevice graphicsDevice,
             int width,
             int height,
@@ -118,36 +131,6 @@ namespace Halves_of_Tria.PrimitiveTextures
             return texture;
         }
 
-        private static void MapFilledEllipse(Color[] flatPixelColours, int width, int height, Color colour)
-        {
-            int totalPixels = width * height;
-            float semiMajorAxis = width / 2f;
-            float semiMinorAxis = height / 2f;
-            float centreX = semiMajorAxis;
-            float centreY = semiMinorAxis;
-
-            float invsSemiMajorAxisSquared = 1f / (semiMajorAxis * semiMajorAxis);
-            float invSemiMinorAxisSquared = 1f / (semiMinorAxis * semiMinorAxis);
-
-            for (int i = 0; i < totalPixels; i++)
-            {
-                int x = i % width;
-                int y = i / width;
-
-                float dx = (x + 0.5f) - centreX;
-                float dy = (y + 0.5f) - centreY;
-
-                if ((dx * dx) * invsSemiMajorAxisSquared + (dy * dy) * invSemiMinorAxisSquared <= 1f)
-                {
-                    flatPixelColours[i] = colour;
-                }
-                else
-                {
-                    flatPixelColours[i] = Color.Transparent;
-                }
-            }
-        }
-
         /// <summary>
         /// Generates a circle texture with the specified radius, color, and style.
         /// </summary>
@@ -162,7 +145,7 @@ namespace Halves_of_Tria.PrimitiveTextures
         /// <returns>A <see cref="Texture2D"/> representing the generated circle.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="radius"/> or <paramref name="thickness"/> is less than
         /// or equal to zero.</exception>
-        public static Texture2D GenerateCircleTexture(GraphicsDevice graphicsDevice, int radius, Color colour, bool isFilled = false, int thickness = 1)
+        public static Texture2D Circle(GraphicsDevice graphicsDevice, int radius, Color colour, bool isFilled = false, int thickness = 1)
         {
             if (thickness < 1)
             {
@@ -275,7 +258,35 @@ namespace Halves_of_Tria.PrimitiveTextures
             return (distanceSquared <= radius * radius) && (distanceSquared >= (radius - thickness) * (radius - thickness));
         }
 
+        private static void MapFilledEllipse(Color[] flatPixelColours, int width, int height, Color colour)
+        {
+            int totalPixels = width * height;
+            float semiMajorAxis = width / 2f;
+            float semiMinorAxis = height / 2f;
+            float centreX = semiMajorAxis;
+            float centreY = semiMinorAxis;
 
+            float invsSemiMajorAxisSquared = 1f / (semiMajorAxis * semiMajorAxis);
+            float invSemiMinorAxisSquared = 1f / (semiMinorAxis * semiMinorAxis);
+
+            for (int i = 0; i < totalPixels; i++)
+            {
+                int x = i % width;
+                int y = i / width;
+
+                float dx = (x + 0.5f) - centreX;
+                float dy = (y + 0.5f) - centreY;
+
+                if ((dx * dx) * invsSemiMajorAxisSquared + (dy * dy) * invSemiMinorAxisSquared <= 1f)
+                {
+                    flatPixelColours[i] = colour;
+                }
+                else
+                {
+                    flatPixelColours[i] = Color.Transparent;
+                }
+            }
+        }
         private static void MapUnfilledEllipse(Color[] flatPixelColours, int width, int height, Color colour, int thickness)
         {
             int totalPixels = width * height;

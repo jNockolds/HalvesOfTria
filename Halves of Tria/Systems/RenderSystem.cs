@@ -8,9 +8,12 @@ namespace Halves_of_Tria.Systems
 {
     public class RenderSystem : EntityDrawSystem
     {
-        private readonly SpriteBatch _spriteBatch;
+        #region Fields and Components
         private ComponentMapper<Texture2D> _textureMapper;
         private ComponentMapper<Transform2> _transformMapper;
+
+        private readonly SpriteBatch _spriteBatch;
+        #endregion
 
         public RenderSystem(SpriteBatch spriteBatch)
             : base(Aspect.All(typeof(Texture2D), typeof(Transform2)))
@@ -18,6 +21,7 @@ namespace Halves_of_Tria.Systems
             _spriteBatch = spriteBatch;
         }
 
+        #region Game Loop Methods
         public override void Initialize(IComponentMapperService mapperService)
         {
             _textureMapper = mapperService.GetMapper<Texture2D>();
@@ -37,13 +41,6 @@ namespace Halves_of_Tria.Systems
 
             _spriteBatch.End();
         }
-
-
-
-
-
-
-
-
+        #endregion
     }
 }

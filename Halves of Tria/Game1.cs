@@ -1,6 +1,6 @@
 ﻿using Halves_of_Tria.Components;
 using Halves_of_Tria.Input;
-using Halves_of_Tria.PrimitiveTextures;
+using Halves_of_Tria.Textures;
 using Halves_of_Tria.Systems;
 using Halves_of_Tria.Configuration;
 using Microsoft.Xna.Framework;
@@ -69,11 +69,12 @@ namespace Halves_of_Tria
             .AddSystem(new RenderSystem(_spriteBatch))
             .AddSystem(new DynamicBodySystem())
             .AddSystem(new SaltMovementSystem())
+            .AddSystem(new DebugVectorRenderSystem(GraphicsDevice))
             .Build();
 
 
             Vector2 saltInitialPosition = new Vector2(WindowWidth / 2, WindowHeight / 2);
-            Texture2D saltTexture = TextureGenerator.GenerateRectangleTexture(GraphicsDevice, 40, 120, Color.White, true);
+            Texture2D saltTexture = TextureGenerator.Rectangle(GraphicsDevice, 40, 120, Color.White, true);
 
             _salt = _world.CreateEntity();
             _salt.Attach(saltTexture);

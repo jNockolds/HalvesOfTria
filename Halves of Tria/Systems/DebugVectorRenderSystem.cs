@@ -1,7 +1,60 @@
-﻿namespace Halves_of_Tria.Systems
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Halves_of_Tria.Components;
+using Halves_of_Tria.Input;
+using Halves_of_Tria.Textures;
+using MonoGame.Extended;
+using MonoGame.Extended.ECS;
+using MonoGame.Extended.ECS.Systems;
+
+
+
+namespace Halves_of_Tria.Systems
 {
-    internal class DebugVectorRenderSystem
+    internal class DebugVectorRenderSystem : EntityDrawSystem
     {
+        #region Fields and Components
+        private ComponentMapper<Transform2> _transformMapper;
+        private ComponentMapper<DynamicBody> _dynamicBodyMapper;
+
+        private bool _showForces;
+        private GraphicsDevice _graphicsDevice;
+        private Texture2D _pixel;
+        #endregion
+
+        public DebugVectorRenderSystem(GraphicsDevice graphicsDevice)
+            : base(Aspect.All(typeof(Transform2), typeof(DynamicBody)))
+        {
+            _graphicsDevice = graphicsDevice;
+        }
+
+        #region Game Loop Methods
+        public override void Initialize(IComponentMapperService mapperService)
+        {
+            _transformMapper = mapperService.GetMapper<Transform2>();
+            _dynamicBodyMapper = mapperService.GetMapper<DynamicBody>();
+
+            _showForces = false;
+            _pixel = TextureGenerator.Pixel(_graphicsDevice, Color.White);
+        }
+
+        public override void Draw(GameTime gameTime)
+        {
+            if (InputHandler.WasActionJustPressed(InputAction.ShowDebugInfo))
+            {
+                _showForces = !_showForces;
+            }
+
+            if (!_showForces)
+            {
+                return;
+            }
+        }
+        #endregion
+
+        #region Helper Methods
+        #endregion
+
         // This system is responsible for rendering visual arrows representing vectors for each DynamicBody.
         // Such vectors include forces, velocities, and accelerations. This is purely for debugging purposes to help visualize the physics interactions in the game.
         // Note that one object may have multiple force vectors acting on it, all displayed, with a resultant force arrow as well. (This will not be necessary for acceleration or velocity.)
