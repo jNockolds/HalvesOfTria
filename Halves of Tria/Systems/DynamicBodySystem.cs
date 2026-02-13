@@ -45,7 +45,6 @@ namespace Halves_of_Tria.Systems
             ApplyImpulses(dynamicBody);
 
             ApplyForces(dynamicBody, transform, deltaTime);
-
         }
 
         private void ApplyImpulses(DynamicBody dynamicBody)
@@ -90,7 +89,9 @@ namespace Halves_of_Tria.Systems
 
         private Vector2 PositionDependentForces(Vector2 position, float mass)
         {
-            Vector2 gravityForce = mass * Config.GravitationalAcceleration;
+            // maybe it's better to calculate this once, during initialization, and store it as a property
+            // then, whenever mass is updated, we can just recalculate the gravity force and update that property
+            Vector2 gravityForce = mass * Config.GravitationalAcceleration; 
 
             return gravityForce; // [Apply any other position-dependent forces by summing them here]
         }

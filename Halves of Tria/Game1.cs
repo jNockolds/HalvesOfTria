@@ -69,7 +69,7 @@ namespace Halves_of_Tria
             .AddSystem(new RenderSystem(_spriteBatch))
             .AddSystem(new DynamicBodySystem())
             .AddSystem(new SaltMovementSystem())
-            .AddSystem(new DebugVectorRenderSystem(GraphicsDevice))
+            .AddSystem(new DebugVectorRenderSystem(GraphicsDevice, _spriteBatch))
             .Build();
 
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Halves_of_Tria.Components;
 using Halves_of_Tria.Input;
@@ -6,6 +7,7 @@ using Halves_of_Tria.Textures;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
+using System.Diagnostics;
 
 
 
@@ -19,13 +21,18 @@ namespace Halves_of_Tria.Systems
 
         private bool _showForces;
         private GraphicsDevice _graphicsDevice;
+        private SpriteBatch _spriteBatch;
         private Texture2D _pixel;
+
+        private float _arrowThickness = 5f;
+        private float _scaleFactor = 1f;
         #endregion
 
-        public DebugVectorRenderSystem(GraphicsDevice graphicsDevice)
+        public DebugVectorRenderSystem(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
             : base(Aspect.All(typeof(Transform2), typeof(DynamicBody)))
         {
             _graphicsDevice = graphicsDevice;
+            _spriteBatch = spriteBatch;
         }
 
         #region Game Loop Methods
@@ -49,10 +56,47 @@ namespace Halves_of_Tria.Systems
             {
                 return;
             }
+
+            _spriteBatch.Begin();
+
+            foreach (var entityId in ActiveEntities)
+            {
+                Transform2 transform = _transformMapper.Get(entityId);
+                DynamicBody dynamicBody = _dynamicBodyMapper.Get(entityId);
+
+                Vector2 arrowOrigin = transform.Position;
+                Vector2 velocity = dynamicBody.Velocity;
+                Vector2 acceleration = dynamicBody.Acceleration;
+                Vector2 resultantForce = dynamicBody.ResultantForce;
+
+                // Draw velocity arrow (Blue)
+                if (velocity.Length() > 0)
+                {
+                    float angle = (float)Math.Atan2(velocity.Y, velocity.X);
+                    Debug.WriteLine($"Velocity: {velocity}, Angle: {angle}");
+                    DrawArrow(arrowOrigin, _scaleFactor * velocity.Length(), angle, Color.Blue);
+                }
+            }
+
+            _spriteBatch.End();
         }
         #endregion
 
         #region Helper Methods
+        private void DrawArrow(Vector2 origin, float length, float orientation, Color color)
+        {
+            _spriteBatch.Draw(
+                _pixel,
+                origin,
+                null,
+                color,
+                orientation,
+                Vector2.Zero,
+                new Vector2(length, _arrowThickness),
+                SpriteEffects.None,
+                0f
+            );
+        }
         #endregion
 
         // This system is responsible for rendering visual arrows representing vectors for each DynamicBody.

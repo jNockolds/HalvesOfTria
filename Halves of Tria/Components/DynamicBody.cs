@@ -24,7 +24,7 @@ namespace Halves_of_Tria.Components
         public float InverseMass;
         public Vector2 Velocity;
         public Vector2 Acceleration;
-        public Vector2 ResultantForce;
+        public Vector2 ResultantForce => Mass * Acceleration;
         public Vector2 ResultantImpulse;
 
         public DynamicBody(float mass)
@@ -32,18 +32,7 @@ namespace Halves_of_Tria.Components
             Mass = mass;
             Velocity = Vector2.Zero;
             Acceleration = Vector2.Zero;
-            ResultantForce = Vector2.Zero;
             ResultantImpulse = Vector2.Zero;
-        }
-
-        public void ApplyForce(Vector2 force)
-        {
-            ResultantForce += force;
-        }
-
-        public void ClearForces()
-        {
-            ResultantForce = Vector2.Zero;
         }
 
         public void ApplyImpulse(Vector2 impulse)

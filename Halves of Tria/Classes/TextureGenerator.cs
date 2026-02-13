@@ -23,6 +23,7 @@ namespace Halves_of_Tria.Textures
             return texture;
         }
 
+
         /// <summary>
         /// Generates an axis-aligned rectangular texture with the specified dimensions, color, and style.
         /// </summary>
