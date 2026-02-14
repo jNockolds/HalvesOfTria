@@ -8,6 +8,8 @@ using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
 using System.Diagnostics;
+using System.Collections.Generic;
+using MonoGame.Extended.Collections;
 
 
 
