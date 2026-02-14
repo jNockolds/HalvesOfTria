@@ -36,7 +36,6 @@ namespace Halves_of_Tria
         #endregion
 
         #region Fields
-        // Class level definition
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
@@ -77,6 +76,7 @@ namespace Halves_of_Tria
             Texture2D saltTexture = TextureGenerator.Rectangle(GraphicsDevice, 40, 120, Color.White, true);
 
             _salt = _world.CreateEntity();
+            _salt.Attach(new PlayerSalt());
             _salt.Attach(saltTexture);
             _salt.Attach(new Transform2(saltInitialPosition));
             _salt.Attach(new Speed(200));

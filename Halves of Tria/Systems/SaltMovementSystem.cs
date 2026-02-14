@@ -10,12 +10,15 @@ namespace Halves_of_Tria.Systems
 {
     internal class SaltMovementSystem : EntityProcessingSystem
     {
+        #region Fields and Components
         private ComponentMapper<Transform2> _transformMapper;
         private ComponentMapper<Speed> _speedMapper;
+        #endregion
 
         public SaltMovementSystem() 
             : base(Aspect.All(typeof(Transform2)).All(typeof(Speed))) { }
 
+        #region Game Loop Methods
         public override void Initialize(IComponentMapperService mapperService)
         {
             _transformMapper = mapperService.GetMapper<Transform2>();
@@ -37,8 +40,7 @@ namespace Halves_of_Tria.Systems
             {
                 transform.Position += (float)gameTime.ElapsedGameTime.TotalSeconds * new Vector2(speed.Value, 0);
             }
-
-
         }
+        #endregion
     }
 }

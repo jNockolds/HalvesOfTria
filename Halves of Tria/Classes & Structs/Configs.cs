@@ -104,7 +104,6 @@ namespace Halves_of_Tria.Configuration
         // it steps back from bin/Debug/net8.0 to the project root directory using "..", "..", ".."
         public static readonly string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "JSON", "Config.json");
 
-
         private static Vector2 _gravitationalAcceleration;
         public static Vector2 GravitationalAcceleration
         {

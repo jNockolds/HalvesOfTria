@@ -8,30 +8,31 @@ using System.Diagnostics;
 
 namespace Halves_of_Tria.Systems
 {
-    internal class DynamicBodySystem : EntityUpdateSystem
+    internal class DynamicBodySystem : EntityProcessingSystem
     {
+        #region Fields and Components
         private ComponentMapper<DynamicBody> _dynamicBodyMapper;
         private ComponentMapper<Transform2> _transformMapper;
+        #endregion
 
         public DynamicBodySystem()
             : base(Aspect.All(typeof(DynamicBody), typeof(Transform2))) { }
 
+        #region Game Loop Methods
         public override void Initialize(IComponentMapperService mapperService)
         {
             _dynamicBodyMapper = mapperService.GetMapper<DynamicBody>();
             _transformMapper = mapperService.GetMapper<Transform2>();
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Process(GameTime gameTime, int entityId)
         {
-            foreach (int entityId in ActiveEntities)
-            {
-                DynamicBody dynamicBody = _dynamicBodyMapper.Get(entityId);
-                Transform2 transform = _transformMapper.Get(entityId);
+            DynamicBody dynamicBody = _dynamicBodyMapper.Get(entityId);
+            Transform2 transform = _transformMapper.Get(entityId);
 
-                UpdateKinematics(dynamicBody, transform, gameTime);
-            }
+            UpdateKinematics(dynamicBody, transform, gameTime);
         }
+        #endregion
 
         #region Helper Methods
         /// <summary>

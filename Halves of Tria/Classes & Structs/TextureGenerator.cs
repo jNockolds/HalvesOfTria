@@ -179,8 +179,6 @@ namespace Halves_of_Tria.Textures
         }
         #endregion
 
-
-
         #region Helper Methods
         private static Color[] MapUnfilledRectangle(Color[] flatPixelColours, int width, int height, Color colour, int thickness)
         {

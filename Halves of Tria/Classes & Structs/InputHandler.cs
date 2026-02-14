@@ -28,13 +28,6 @@ namespace Halves_of_Tria.Input
     /// </summary>
     internal static class InputHandler
     {
-        #region Properties
-        public static Vector2 GetMousePosition()
-        {
-            Point position = MouseExtended.GetState().Position;
-            return new Vector2(position.X, position.Y);
-        }
-        #endregion
 
         #region Fields
         private static readonly float _gamepadDeadzone = 0.2f;
@@ -357,6 +350,14 @@ namespace Halves_of_Tria.Input
                 }
             }
             return false;
+        }
+        #endregion
+
+        #region Misc. Methods
+        public static Vector2 GetMousePosition()
+        {
+            Point position = MouseExtended.GetState().Position;
+            return new Vector2(position.X, position.Y);
         }
         #endregion
 
