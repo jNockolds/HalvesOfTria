@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using Halves_of_Tria.Configuration;
 
 namespace Halves_of_Tria.Components
 {
@@ -16,7 +17,7 @@ namespace Halves_of_Tria.Components
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException("Mass must be greater than zero.", nameof(value));
                 _mass = value;
-                InverseMass = 1f / value;
+                UpdateMassRelatedProperties(value);
             }
         }
         /// <summary>
@@ -36,12 +37,20 @@ namespace Halves_of_Tria.Components
 
         public DynamicBody(float mass)
         {
+            Force gravitationalForce = new(ForceType.Gravitational, mass, Config.GravitationalAcceleration);
+            NonVelocityDependentForces = new() { gravitationalForce };
+
             Mass = mass;
             Velocity = Vector2.Zero;
             Acceleration = Vector2.Zero;
             ResultantImpulse = Vector2.Zero;
+
+
+            Force linearDrag = new(ForceType.LinearDrag, - Config.DefaultLinearDragCoefficient * Velocity);
+            VelocityDependentForces = new() { linearDrag };
         }
 
+        #region Methods
         public void AddForce(Force force)
         {
             if (force.IsVelocityDependent)
@@ -62,8 +71,44 @@ namespace Halves_of_Tria.Components
             }
             else
             {
-                NonVelocityDependentForces.Add(force);
+                NonVelocityDependentForces.Remove(force);
             }
+        }
+
+        public void UpdateForce(Force newForce)
+        {
+            Force oldForce;
+            if (newForce.IsVelocityDependent)
+            {
+                oldForce = VelocityDependentForces.Find(x => x.Type == newForce.Type);
+            }
+            else
+            {
+                oldForce = NonVelocityDependentForces.Find(x => x.Type == newForce.Type);
+            }
+
+            RemoveForce(oldForce);
+            AddForce(newForce);
+        }
+
+        public void UpdateNonVelocityDependentForces()
+        {
+            // [No VelocityDependentForces currently need updating dynamically]
+        }
+        public void UpdateNonVelocityDependentForces(Vector2 position)
+        {
+            // [No VelocityDependentForces currently need updating dynamically]
+        }
+
+        public void UpdateVelocityDependentForces(Vector2 overrideVelocity)
+        {
+            Force newLinearDrag = new(ForceType.LinearDrag, -Config.DefaultLinearDragCoefficient * overrideVelocity);
+            UpdateForce(newLinearDrag);
+        }
+        public void UpdateVelocityDependentForces()
+        {
+            Force newLinearDrag = new(ForceType.LinearDrag, -Config.DefaultLinearDragCoefficient * Velocity);
+            UpdateForce(newLinearDrag);
         }
 
         public void ApplyImpulse(Vector2 impulse)
@@ -75,5 +120,16 @@ namespace Halves_of_Tria.Components
         {
             ResultantImpulse = Vector2.Zero;
         }
+        #endregion
+
+        #region Helper Methods
+        private void UpdateMassRelatedProperties(float newMass)
+        {
+            InverseMass = 1f / newMass;
+
+            Force newGravitationalForce = new(ForceType.Gravitational, newMass, Config.GravitationalAcceleration);
+            UpdateForce(newGravitationalForce);
+        }
+        #endregion
     }
 }

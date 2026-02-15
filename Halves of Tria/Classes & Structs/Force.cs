@@ -2,17 +2,38 @@
 
 namespace Halves_of_Tria
 {
+    public enum ForceType
+    {
+        Gravitational,
+        LinearDrag
+    }
+
     internal struct Force
     {
-        public string Name { get; }
+        public ForceType Type { get; }
         public Vector2 Value { get; }
         public bool IsVelocityDependent { get; }
 
-        public Force(string name, Vector2 value, bool isVelocityDependent = false)
+        public Force(ForceType type, Vector2 value)
         {
-            Name = name;
+            Type = type;
             Value = value;
-            IsVelocityDependent = isVelocityDependent;
+
+            switch (type)
+            {
+                case ForceType.LinearDrag:
+                    IsVelocityDependent = true;
+                    break;
+                case ForceType.Gravitational:
+                    IsVelocityDependent = false;
+                    break;
+                default:
+                    IsVelocityDependent = false;
+                    break;
+            }
         }
+
+        public Force(ForceType type, float mass, Vector2 acceleration)
+            : this(type, mass * acceleration) { }
     }
 }

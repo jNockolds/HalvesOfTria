@@ -8,24 +8,29 @@ using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
 using System.Diagnostics;
-using System.Collections.Generic;
-using MonoGame.Extended.Collections;
 
 
 
 namespace Halves_of_Tria.Systems
 {
+    public enum VectorType
+    {
+        None,
+        Force,
+        Acceleration,
+        Velocity
+    }
     internal class DebugVectorRenderSystem : EntityDrawSystem
     {
         #region Fields and Components
         private ComponentMapper<Transform2> _transformMapper;
         private ComponentMapper<DynamicBody> _dynamicBodyMapper;
 
-        private bool _showForces;
         private GraphicsDevice _graphicsDevice;
         private SpriteBatch _spriteBatch;
         private Texture2D _pixel;
 
+        private VectorType _vectorsShown;
         private float _arrowThickness = 5f;
         private float _scaleFactor = 1f;
         #endregion
@@ -43,18 +48,18 @@ namespace Halves_of_Tria.Systems
             _transformMapper = mapperService.GetMapper<Transform2>();
             _dynamicBodyMapper = mapperService.GetMapper<DynamicBody>();
 
-            _showForces = false;
+            _vectorsShown = 0;
             _pixel = TextureGenerator.Pixel(_graphicsDevice, Color.White);
         }
 
         public override void Draw(GameTime gameTime)
         {
-            if (InputHandler.WasActionJustPressed(InputAction.ShowDebugInfo))
+            if (InputHandler.WasActionJustPressed(InputAction.CycleDebugVectors))
             {
-                _showForces = !_showForces;
+                CycleVectorsShown();
             }
 
-            if (!_showForces)
+            if (_vectorsShown == VectorType.None)
             {
                 return;
             }
@@ -66,17 +71,20 @@ namespace Halves_of_Tria.Systems
                 Transform2 transform = _transformMapper.Get(entityId);
                 DynamicBody dynamicBody = _dynamicBodyMapper.Get(entityId);
 
-                Vector2 arrowOrigin = transform.Position;
-                Vector2 velocity = dynamicBody.Velocity;
-                Vector2 acceleration = dynamicBody.Acceleration;
-                Vector2 resultantForce = dynamicBody.ResultantForce;
-
-                // Draw velocity arrow (Blue)
-                if (velocity.Length() > 0)
+                switch (_vectorsShown)
                 {
-                    float angle = (float)Math.Atan2(velocity.Y, velocity.X);
-                    Debug.WriteLine($"Velocity: {velocity}, Angle: {angle}");
-                    DrawArrow(arrowOrigin, _scaleFactor * velocity.Length(), angle, Color.Blue);
+                    case VectorType.Force:
+                        DrawArrow(transform.Position, dynamicBody.ResultantForce, Color.Red);
+                        Debug.WriteLine($"Entity {entityId} - Resultant Force: {dynamicBody.ResultantForce}");
+                        break;
+                    case VectorType.Acceleration:
+                        DrawArrow(transform.Position, dynamicBody.Acceleration, Color.Green);
+                        Debug.WriteLine($"Entity {entityId} - Acceleration: {dynamicBody.Acceleration}");
+                        break;
+                    case VectorType.Velocity:
+                        DrawArrow(transform.Position, dynamicBody.Velocity, Color.Blue);
+                        Debug.WriteLine($"Entity {entityId} - Velocity: {dynamicBody.Velocity}");
+                        break;
                 }
             }
 
@@ -85,6 +93,15 @@ namespace Halves_of_Tria.Systems
         #endregion
 
         #region Helper Methods
+        private void CycleVectorsShown()
+        {
+            _vectorsShown++;
+            if ((int)_vectorsShown >= 4)
+            {
+                _vectorsShown = VectorType.None;
+            }
+        }
+
         private void DrawArrow(Vector2 origin, float length, float orientation, Color color)
         {
             _spriteBatch.Draw(
@@ -98,6 +115,15 @@ namespace Halves_of_Tria.Systems
                 SpriteEffects.None,
                 0f
             );
+        }
+
+        private void DrawArrow(Vector2 origin, Vector2 vector, Color color)
+        {
+            if (vector.Length() > 0)
+            {
+                float angle = (float)Math.Atan2(vector.Y, vector.X);
+                DrawArrow(origin, _scaleFactor * vector.Length(), angle, color);
+            }
         }
         #endregion
 

@@ -8,6 +8,7 @@ using System.Diagnostics;
 
 namespace Halves_of_Tria.Systems
 {
+    // [BUG: gravity is being applied twice; linear drag isn't being applied]
     internal class DynamicBodySystem : EntityProcessingSystem
     {
         #region Fields and Components
@@ -60,7 +61,7 @@ namespace Halves_of_Tria.Systems
             // If you're debugging this... I wish you good fortune in the wars to come. Good luck!
 
             // Accumulate forces for this update:
-            Vector2 initialPositionDependentForces = PositionDependentForces(transform.Position, dynamicBody.Mass);
+            Vector2 initialPositionDependentForces = TotalNonVelocityDependentForces(dynamicBody, transform.Position);
             Vector2 initialAcceleration = initialPositionDependentForces * dynamicBody.InverseMass;
 
             // Predict position via Velocity Verlet integration:
@@ -70,10 +71,10 @@ namespace Halves_of_Tria.Systems
             Vector2 halfStepVelocity = dynamicBody.Velocity + 0.5f * initialAcceleration * dt;
 
             // Compute velocity-dependent forces at the half-step velocity:
-            Vector2 velocityDependentForces = VelocityDependentForces(halfStepVelocity);
+            Vector2 velocityDependentForces = TotalVelocityDependentForces(dynamicBody, halfStepVelocity);
 
             // Compute position-dependent forces at the new position:
-            Vector2 newPositionDependentForces = PositionDependentForces(newPosition, dynamicBody.Mass);
+            Vector2 newPositionDependentForces = TotalNonVelocityDependentForces(dynamicBody, newPosition);
 
             // Sum all forces to get the total force at the new position and half-step velocity:
             Vector2 newResultantForce = newPositionDependentForces + velocityDependentForces;
@@ -88,19 +89,26 @@ namespace Halves_of_Tria.Systems
             dynamicBody.Acceleration = newAcceleration;
         }
 
-        private Vector2 PositionDependentForces(Vector2 position, float mass)
+        private Vector2 TotalNonVelocityDependentForces(DynamicBody dynamicBody, Vector2 position)
         {
-            // maybe it's better to calculate this once, during initialization, and store it as a property
-            // then, whenever mass is updated, we can just recalculate the gravity force and update that property
-            Vector2 gravityForce = mass * Config.GravitationalAcceleration; 
-
-            return gravityForce; // [Apply any other position-dependent forces by summing them here]
+            dynamicBody.UpdateNonVelocityDependentForces(position);
+            Vector2 totalForce = Vector2.Zero;
+            foreach (Force force in dynamicBody.NonVelocityDependentForces)
+            {
+                totalForce += force.Value;
+            }
+            return totalForce;
         }
 
-        private Vector2 VelocityDependentForces(Vector2 velocity)
+        private Vector2 TotalVelocityDependentForces(DynamicBody dynamicBody, Vector2 overrideVelocity)
         {
-            Vector2 dragForce = -Config.DefaultLinearDragCoefficient * velocity;
-            return dragForce; // [Apply any other velocity-dependent forces by summing them here]
+            dynamicBody.UpdateVelocityDependentForces(overrideVelocity);
+            Vector2 totalForce = Vector2.Zero;
+            foreach (Force force in dynamicBody.NonVelocityDependentForces)
+            {
+                totalForce += force.Value;
+            }
+            return totalForce;
         }
         #endregion
     }

@@ -16,7 +16,7 @@ namespace Halves_of_Tria.Input
         SaltWalkRight,
         SaltJump,
         QuickQuit,
-        ShowDebugInfo,
+        CycleDebugVectors,
         SaltDebugMove,
         ReloadConfig,
     }
@@ -51,7 +51,7 @@ namespace Halves_of_Tria.Input
             { InputAction.SaltWalkRight, new List<Keys> { Keys.D, Keys.Right } },
             { InputAction.SaltJump, new List<Keys> { Keys.W, Keys.Up, Keys.Space } },
             { InputAction.QuickQuit, new List<Keys> { Keys.X } },
-            { InputAction.ShowDebugInfo, new List<Keys> { Keys.Tab } },
+            { InputAction.CycleDebugVectors, new List<Keys> { Keys.Tab } },
             { InputAction.ReloadConfig, new List<Keys> { Keys.OemCloseBrackets } }
         };
 
