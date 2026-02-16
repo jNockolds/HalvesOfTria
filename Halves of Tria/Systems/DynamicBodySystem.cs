@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
-using Halves_of_Tria.Configuration;
 using System.Diagnostics;
 
 namespace Halves_of_Tria.Systems
@@ -104,7 +103,7 @@ namespace Halves_of_Tria.Systems
         {
             dynamicBody.UpdateVelocityDependentForces(overrideVelocity);
             Vector2 totalForce = Vector2.Zero;
-            foreach (Force force in dynamicBody.NonVelocityDependentForces)
+            foreach (Force force in dynamicBody.VelocityDependentForces)
             {
                 totalForce += force.Value;
             }

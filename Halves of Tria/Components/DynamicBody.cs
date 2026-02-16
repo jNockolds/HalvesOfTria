@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Halves_of_Tria.Configuration;
+using System.Diagnostics;
 
 namespace Halves_of_Tria.Components
 {
@@ -37,17 +38,18 @@ namespace Halves_of_Tria.Components
 
         public DynamicBody(float mass)
         {
-            Force gravitationalForce = new(ForceType.Gravitational, mass, Config.GravitationalAcceleration);
-            NonVelocityDependentForces = new() { gravitationalForce };
+            NonVelocityDependentForces = new();
+            VelocityDependentForces = new();
 
-            Mass = mass;
+            Force gravitationalForce = new(ForceType.Gravitational, mass, Config.GravitationalAcceleration);
+            AddForce(gravitationalForce);
+            Force linearDrag = new(ForceType.LinearDrag, -Config.DefaultLinearDragCoefficient * Velocity);
+            AddForce(linearDrag);
+
+            Mass = mass; // mass updates the gravitational force when changed, so this needs to be assigned after the gravitational force is added
             Velocity = Vector2.Zero;
             Acceleration = Vector2.Zero;
             ResultantImpulse = Vector2.Zero;
-
-
-            Force linearDrag = new(ForceType.LinearDrag, - Config.DefaultLinearDragCoefficient * Velocity);
-            VelocityDependentForces = new() { linearDrag };
         }
 
         #region Methods
