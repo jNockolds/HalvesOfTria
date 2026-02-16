@@ -1,4 +1,5 @@
 ﻿using Halves_of_Tria.Components;
+using Halves_of_Tria.Configuration;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
@@ -7,7 +8,6 @@ using System.Diagnostics;
 
 namespace Halves_of_Tria.Systems
 {
-    // [BUG: gravity is being applied twice; linear drag isn't being applied]
     internal class DynamicBodySystem : EntityProcessingSystem
     {
         #region Fields and Components
@@ -31,6 +31,10 @@ namespace Halves_of_Tria.Systems
             Transform2 transform = _transformMapper.Get(entityId);
 
             UpdateKinematics(dynamicBody, transform, gameTime);
+
+            Debug.WriteLine($"Entity {entityId} - Resultant Force: {dynamicBody.ResultantForce}");
+            Debug.WriteLine($"Entity {entityId} - Acceleration: {dynamicBody.Acceleration}");
+            Debug.WriteLine($"Entity {entityId} - Velocity: {dynamicBody.Velocity}");
         }
         #endregion
 
@@ -44,70 +48,85 @@ namespace Halves_of_Tria.Systems
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             ApplyImpulses(dynamicBody);
-
             ApplyForces(dynamicBody, transform, deltaTime);
+            UpdateForces(dynamicBody);
+            dynamicBody.ResultantForce = GetResultantForce(dynamicBody);
         }
 
         private void ApplyImpulses(DynamicBody dynamicBody)
         {
-            dynamicBody.Velocity += dynamicBody.ResultantImpulse * dynamicBody.InverseMass;
-            dynamicBody.ClearImpulses();
+            dynamicBody.Velocity += dynamicBody.UnspentImpulse * dynamicBody.InverseMass;
+            ClearImpulses(dynamicBody);
         }
 
-
-        private void ApplyForces(DynamicBody dynamicBody, Transform2 transform, float dt)
+        private void ApplyForces(DynamicBody dynamicBody, Transform2 transform, float deltaTime)
         {
-            // If you're debugging this... I wish you good fortune in the wars to come. Good luck!
-
-            // Accumulate forces for this update:
-            Vector2 initialPositionDependentForces = TotalNonVelocityDependentForces(dynamicBody, transform.Position);
-            Vector2 initialAcceleration = initialPositionDependentForces * dynamicBody.InverseMass;
-
-            // Predict position via Velocity Verlet integration:
-            Vector2 newPosition = transform.Position + dynamicBody.Velocity * dt + 0.5f * initialAcceleration * (dt * dt);
-
-            // Predict half-step velocity:
-            Vector2 halfStepVelocity = dynamicBody.Velocity + 0.5f * initialAcceleration * dt;
-
-            // Compute velocity-dependent forces at the half-step velocity:
-            Vector2 velocityDependentForces = TotalVelocityDependentForces(dynamicBody, halfStepVelocity);
-
-            // Compute position-dependent forces at the new position:
-            Vector2 newPositionDependentForces = TotalNonVelocityDependentForces(dynamicBody, newPosition);
-
-            // Sum all forces to get the total force at the new position and half-step velocity:
-            Vector2 newResultantForce = newPositionDependentForces + velocityDependentForces;
-            Vector2 newAcceleration = newResultantForce * dynamicBody.InverseMass;
-
-            // Update velocity using the average of the initial and new acceleration:
-            Vector2 newVelocity = dynamicBody.Velocity + 0.5f * (initialAcceleration + newAcceleration) * dt;
-
-            // Update the dynamic body's state:
-            transform.Position = newPosition;
-            dynamicBody.Velocity = newVelocity;
-            dynamicBody.Acceleration = newAcceleration;
+            dynamicBody.Acceleration = GetResultantForce(dynamicBody) * dynamicBody.InverseMass;
+            dynamicBody.Velocity += dynamicBody.Acceleration * deltaTime;
+            transform.Position += dynamicBody.Velocity * deltaTime;
         }
 
-        private Vector2 TotalNonVelocityDependentForces(DynamicBody dynamicBody, Vector2 position)
+        private Vector2 GetResultantForce(DynamicBody dynamicBody)
         {
-            dynamicBody.UpdateNonVelocityDependentForces(position);
             Vector2 totalForce = Vector2.Zero;
-            foreach (Force force in dynamicBody.NonVelocityDependentForces)
+            foreach (Force force in dynamicBody.Forces)
             {
                 totalForce += force.Value;
             }
             return totalForce;
         }
 
-        private Vector2 TotalVelocityDependentForces(DynamicBody dynamicBody, Vector2 overrideVelocity)
+        public void UpdateForce(DynamicBody dynamicBody, Force newForce)
         {
-            dynamicBody.UpdateVelocityDependentForces(overrideVelocity);
-            Vector2 totalForce = Vector2.Zero;
-            foreach (Force force in dynamicBody.VelocityDependentForces)
+            int forceIndex = dynamicBody.Forces.FindIndex(x => x.Type == newForce.Type);
+
+            if (forceIndex >= 0) // if dynamicBody.Forces contains the force
             {
-                totalForce += force.Value;
+                dynamicBody.Forces[forceIndex] = newForce;
             }
-            return totalForce;
+        }
+
+        public void UpdateForces(DynamicBody dynamicBody)
+        {
+            Force newLinearDrag = new(ForceType.LinearDrag, -Config.DefaultLinearDragCoefficient * dynamicBody.Velocity);
+            UpdateForce(dynamicBody, newLinearDrag);
+        }
+
+        // Most of the following methods are not being used yet, but they could be useful when there are impulses and temporary forces in play:
+
+        public void AddForce(DynamicBody dynamicBody, Force force)
+        {
+            int forceIndex = dynamicBody.Forces.FindIndex(x => x.Type == force.Type);
+
+            if (forceIndex < 0) // if dynamicBody.Forces doesn't already contain the force
+            {
+                dynamicBody.Forces.Add(force);
+            }
+        }
+
+        public void ZeroForce(DynamicBody dynamicBody, Force force)
+        {
+            int forceIndex = dynamicBody.Forces.FindIndex(x => x.Type == force.Type);
+
+            if (forceIndex >= 0) // if dynamicBody.Forces contains the force
+            {
+                dynamicBody.Forces[forceIndex] = new(force.Type, Vector2.Zero);
+            }
+        }
+
+        public void RemoveForce(DynamicBody dynamicBody, Force force)
+        {
+            dynamicBody.Forces.Remove(force);
+        }
+
+        public void ApplyImpulse(DynamicBody dynamicBody, Vector2 impulse)
+        {
+            dynamicBody.UnspentImpulse += impulse;
+        }
+
+        public void ClearImpulses(DynamicBody dynamicBody)
+        {
+            dynamicBody.UnspentImpulse = Vector2.Zero;
         }
         #endregion
     }

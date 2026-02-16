@@ -9,8 +9,6 @@ using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
 using System.Diagnostics;
 
-
-
 namespace Halves_of_Tria.Systems
 {
     public enum VectorType
@@ -75,15 +73,12 @@ namespace Halves_of_Tria.Systems
                 {
                     case VectorType.Force:
                         DrawArrow(transform.Position, dynamicBody.ResultantForce, Color.Red);
-                        Debug.WriteLine($"Entity {entityId} - Resultant Force: {dynamicBody.ResultantForce}");
                         break;
                     case VectorType.Acceleration:
                         DrawArrow(transform.Position, dynamicBody.Acceleration, Color.Green);
-                        Debug.WriteLine($"Entity {entityId} - Acceleration: {dynamicBody.Acceleration}");
                         break;
                     case VectorType.Velocity:
                         DrawArrow(transform.Position, dynamicBody.Velocity, Color.Blue);
-                        Debug.WriteLine($"Entity {entityId} - Velocity: {dynamicBody.Velocity}");
                         break;
                 }
             }
