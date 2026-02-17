@@ -1,6 +1,6 @@
 {
   "GravitationalAcceleration": {
-    "X": 0,
+    "X": 4,
     "Y": 9.81
   },
   "DefaultLinearDragCoefficient": 0.1,

@@ -14,7 +14,8 @@ namespace Halves_of_Tria.Systems
     public enum VectorType
     {
         None,
-        Force,
+        Forces,
+        ResultantForce,
         Acceleration,
         Velocity
     }
@@ -29,8 +30,20 @@ namespace Halves_of_Tria.Systems
         private Texture2D _pixel;
 
         private VectorType _vectorsShown;
-        private float _arrowThickness = 5f;
-        private float _scaleFactor = 1f;
+
+        // Arrow details fields:
+
+        private Color _forcesColour = Color.Orange;
+        private Color _resultantForceColour = Color.Red;
+        private Color _accelerationColour = Color.Lime;
+        private Color _velocityColour = Color.Blue;
+
+        private float _forceScaleFactor = 10f;
+        private float _velocityScaleFactor = 1f;
+
+        private float _arrowThickness = 1f;
+        private float _arrowheadLength = 5f;
+        private float _arrowheadAngleOffset = (float)((5f/6f) * Math.PI); // 150 (or 30) degrees from the arrow's direction
         #endregion
 
         public DebugVectorRenderSystem(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
@@ -71,14 +84,21 @@ namespace Halves_of_Tria.Systems
 
                 switch (_vectorsShown)
                 {
-                    case VectorType.Force:
-                        DrawArrow(transform.Position, dynamicBody.ResultantForce, Color.Red);
+                    case VectorType.Forces:
+                        foreach (Force force in dynamicBody.Forces)
+                        {
+                            DrawArrow(transform.Position, force.Value, _forcesColour, _forceScaleFactor);
+                        }
+                        break;
+                    case VectorType.ResultantForce:
+                        DrawArrow(transform.Position, dynamicBody.ResultantForce, _resultantForceColour, _forceScaleFactor);
                         break;
                     case VectorType.Acceleration:
-                        DrawArrow(transform.Position, dynamicBody.Acceleration, Color.Green);
+                        float accelerationScaleFactor = _forceScaleFactor * dynamicBody.InverseMass;
+                        DrawArrow(transform.Position, dynamicBody.Acceleration, _accelerationColour, accelerationScaleFactor);
                         break;
                     case VectorType.Velocity:
-                        DrawArrow(transform.Position, dynamicBody.Velocity, Color.Blue);
+                        DrawArrow(transform.Position, dynamicBody.Velocity, _velocityColour, _velocityScaleFactor);
                         break;
                 }
             }
@@ -91,13 +111,26 @@ namespace Halves_of_Tria.Systems
         private void CycleVectorsShown()
         {
             _vectorsShown++;
-            if ((int)_vectorsShown >= 4)
+            if ((int)_vectorsShown >= 5)
             {
                 _vectorsShown = VectorType.None;
             }
         }
 
-        private void DrawArrow(Vector2 origin, float length, float orientation, Color color)
+        private void DrawArrow(Vector2 origin, Vector2 arrowVector, Color color, float scaleFactor)
+        {
+            if (arrowVector.Length() > 0)
+            {
+                Vector2 scaledVector = scaleFactor * arrowVector;
+                float arrowLength = scaledVector.Length();
+                float shaftAngle = (float)Math.Atan2(arrowVector.Y, arrowVector.X);
+
+                DrawArrowShaft(origin, arrowLength, shaftAngle, color);
+                DrawArrowhead(scaledVector, origin, arrowLength, shaftAngle, color);
+            }
+        }
+
+        private void DrawArrowShaft(Vector2 origin, float length, float orientation, Color color)
         {
             _spriteBatch.Draw(
                 _pixel,
@@ -112,21 +145,45 @@ namespace Halves_of_Tria.Systems
             );
         }
 
-        private void DrawArrow(Vector2 origin, Vector2 vector, Color color)
+        private void DrawArrowhead(Vector2 scaledArrowVector, Vector2 origin, float arrowLength, float orientation, Color color)
         {
-            if (vector.Length() > 0)
-            {
-                float angle = (float)Math.Atan2(vector.Y, vector.X);
-                DrawArrow(origin, _scaleFactor * vector.Length(), angle, color);
-            }
+            Vector2 arrowEndpoint = origin + scaledArrowVector;
+
+            float angle1 = orientation + _arrowheadAngleOffset;
+            float angle2 = orientation - _arrowheadAngleOffset;
+
+            _spriteBatch.Draw(
+                _pixel,
+                arrowEndpoint,
+                null,
+                color,
+                angle1,
+                Vector2.Zero,
+                new Vector2(_arrowheadLength, _arrowThickness),
+                SpriteEffects.None,
+                0f
+            );
+
+            _spriteBatch.Draw(
+                _pixel,
+                arrowEndpoint,
+                null,
+                color,
+                angle2,
+                Vector2.Zero,
+                new Vector2(_arrowheadLength, _arrowThickness),
+                SpriteEffects.None,
+                0f
+            );
         }
+
         #endregion
 
         // This system is responsible for rendering visual arrows representing vectors for each DynamicBody.
         // Such vectors include forces, velocities, and accelerations. This is purely for debugging purposes to help visualize the physics interactions in the game.
         // Note that one object may have multiple force vectors acting on it, all displayed, with a resultant force arrow as well. (This will not be necessary for acceleration or velocity.)
-        // Colour will vary based on the type of the vector.
-        // MAgnitude will be represented by the length of the arrow, but also by a numerical label.
+        // Colour will vary based on the type of the scaledArrowVector.
+        // MAgnitude will be represented by the arrowLength of the arrow, but also by a numerical label.
 
         // Implementation details:
         // - This system should run after the DynamicBodySystem, so that it can access the updated physics data for each DynamicBody.
@@ -134,15 +191,15 @@ namespace Halves_of_Tria.Systems
         //     - Transform2
         //     - DynamicBody
         // - Initialize():
-        //     - Generate a 1 pixel white stock texture that can be resized procedurally to create a dynamic arrow for all vectors, scaling and rotating it appropriately for each vector's magnitude and direction.
+        //     - Generate a 1 pixel white stock texture that can be resized procedurally to create a dynamic arrow for all vectors, scaling and rotating it appropriately for each scaledArrowVector's magnitude and direction.
         //         - It can be resized, rotated, and recoloured as part of SpriteBatch.Draw().
-        //         - To make an arrow, just stretch the pixel to its length, and add two short stretched pixels (i.e. rectangles) on the end (45 or 30 degrees from the shaft? Although remember MonoGame works in radians (I think)).
+        //         - To make an arrow, just stretch the pixel to its arrowLength, and add two short stretched pixels (i.e. rectangles) on the end (45 or 30 degrees from the shaft? Although remember MonoGame works in radians (I think)).
         // - Draw():
-        //     - [Note: Add most of the below logic to a DrawArrow() function]
+        //     - [Note: Add most of the below logic to a DrawArrowShaft() function]
         //     - [Note: needs to be toggelable, via a keypress or something (maybe it cycles between On -> Forces -> Accelerations -> Velocities -> On -> ...).]
         //         - Look into whether it's possible to toggle the system on and off without having to add/remove it from the world, as that would be more efficient than having to add/remove it every time the user wants to toggle it.
         //     - For each DynamicBody, retrieve its velocity, acceleration, and forces acting upon it, calculating the resultant force accordingly.
-        //     - For each vector, calculate the appropriate length and direction for the arrow based on its magnitude and direction.
+        //     - For each scaledArrowVector, calculate the appropriate arrowLength and direction for the arrow based on its magnitude and direction.
         //         - Have some cap on the size of arrows (depending on the largest arrow) and resize all other arrows to be less than that, keeping their relative sizes.
         //     - Render the arrow at the position of the DynamicBody.
         //     - Arrow Colours:

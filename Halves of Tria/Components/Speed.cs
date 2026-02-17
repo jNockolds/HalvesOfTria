@@ -1,7 +1,7 @@
 ﻿namespace Halves_of_Tria.Components
 {
     /// <summary>
-    /// [PLACEHOLDER COMPONENT: Remove as soon as Force-dependent input is implemented.]
+    /// [PLACEHOLDER COMPONENT: Remove as soon as ResultantForce-dependent input is implemented.]
     /// </summary>
     internal class Speed
     {

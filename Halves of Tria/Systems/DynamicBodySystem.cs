@@ -31,10 +31,6 @@ namespace Halves_of_Tria.Systems
             Transform2 transform = _transformMapper.Get(entityId);
 
             UpdateKinematics(dynamicBody, transform, gameTime);
-
-            Debug.WriteLine($"Entity {entityId} - Resultant Force: {dynamicBody.ResultantForce}");
-            Debug.WriteLine($"Entity {entityId} - Acceleration: {dynamicBody.Acceleration}");
-            Debug.WriteLine($"Entity {entityId} - Velocity: {dynamicBody.Velocity}");
         }
         #endregion
 
