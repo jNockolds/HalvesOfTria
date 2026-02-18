@@ -43,6 +43,12 @@ namespace Halves_of_Tria
         private Entity _salt;
         #endregion
 
+        // test variables:
+        private Vector2 _saltInitialPosition;
+        private Texture2D _saltTexture;
+        public static float FloorLevel = 0.8f; // as a proportion of the window's height
+        // end of test variables
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -72,13 +78,13 @@ namespace Halves_of_Tria
             .Build();
 
 
-            Vector2 saltInitialPosition = new Vector2(WindowWidth / 2, WindowHeight / 2);
-            Texture2D saltTexture = TextureGenerator.Rectangle(GraphicsDevice, 40, 120, Color.White, true);
+            _saltInitialPosition = new Vector2(WindowWidth / 2, WindowHeight / 2);
+            _saltTexture = TextureGenerator.Rectangle(GraphicsDevice, 40, 120, Color.White, true);
 
             _salt = _world.CreateEntity();
             _salt.Attach(new PlayerSalt());
-            _salt.Attach(saltTexture);
-            _salt.Attach(new Transform2(saltInitialPosition));
+            _salt.Attach(_saltTexture);
+            _salt.Attach(new Transform2(_saltInitialPosition));
             _salt.Attach(new Speed(200));
             _salt.Attach(new DynamicBody(1));
         }

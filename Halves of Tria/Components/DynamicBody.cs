@@ -45,6 +45,8 @@ namespace Halves_of_Tria.Components
             Forces.Add(gravitationalForce);
             Force linearDrag = new(ForceType.LinearDrag, -Config.DefaultLinearDragCoefficient * Velocity);
             Forces.Add(linearDrag);
+            Force normal = new(ForceType.Normal, Vector2.Zero);
+            Forces.Add(normal);
 
             Mass = mass; // mass updates the gravitational force when changed, so this needs to be assigned after the gravitational force is added
             Velocity = Vector2.Zero;

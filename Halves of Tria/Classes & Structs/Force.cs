@@ -5,7 +5,8 @@ namespace Halves_of_Tria
     public enum ForceType
     {
         Gravitational,
-        LinearDrag
+        LinearDrag,
+        Normal
     }
 
     internal struct Force
