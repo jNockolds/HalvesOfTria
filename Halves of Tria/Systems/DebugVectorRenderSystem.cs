@@ -21,6 +21,13 @@ namespace Halves_of_Tria.Systems
     }
     internal class DebugVectorRenderSystem : EntityDrawSystem
     {
+        // [TODO]:
+        //     - After a debug menu is implemented, add force names (using ForceType) on each force arrow, and values on every arrow
+        //     - Have some cap on the size of arrows (depending on the largest arrow) and resize all other arrows to be less than that, keeping their relative sizes.
+        //     - Think about how to handle multiple forces acting in the same direction on the same object.
+        //         - Maybe each arrow can be offset slightly from the centre of the object, so they don't completely overlap and become indistinguishable.
+        //         - Todo: figure out how to dynamically handle this with any number of forces, and with forces at any rotation.
+
         #region Fields and Components
         private ComponentMapper<Transform2> _transformMapper;
         private ComponentMapper<DynamicBody> _dynamicBodyMapper;
@@ -30,6 +37,7 @@ namespace Halves_of_Tria.Systems
         private Texture2D _pixel;
 
         private VectorType _vectorsShown;
+
 
         // Arrow details fields:
 
@@ -108,6 +116,9 @@ namespace Halves_of_Tria.Systems
         #endregion
 
         #region Helper Methods
+        /// <summary>
+        /// Cycles the current vector display mode to the next available option, resetting to none after the last mode.
+        /// </summary>
         private void CycleVectorsShown()
         {
             _vectorsShown++;
@@ -117,6 +128,15 @@ namespace Halves_of_Tria.Systems
             }
         }
 
+        /// <summary>
+        /// Draws an arrow from the specified origin in the direction and magnitude defined by the given vector, using
+        /// the specified color and scale factor.
+        /// </summary>
+        /// <param name="origin">The starting point of the arrow in world or screen coordinates.</param>
+        /// <param name="arrowVector">A vector representing the direction and length of the arrow before scaling. If the vector has zero length,
+        /// no arrow is drawn.</param>
+        /// <param name="color">The color to use when rendering the arrow.</param>
+        /// <param name="scaleFactor">A multiplier applied to the length of the arrow. Must be a positive value to produce a visible arrow.</param>
         private void DrawArrow(Vector2 origin, Vector2 arrowVector, Color color, float scaleFactor)
         {
             if (arrowVector.Length() > 0)
@@ -176,40 +196,6 @@ namespace Halves_of_Tria.Systems
                 0f
             );
         }
-
         #endregion
-
-        // This system is responsible for rendering visual arrows representing vectors for each DynamicBody.
-        // Such vectors include forces, velocities, and accelerations. This is purely for debugging purposes to help visualize the physics interactions in the game.
-        // Note that one object may have multiple force vectors acting on it, all displayed, with a resultant force arrow as well. (This will not be necessary for acceleration or velocity.)
-        // Colour will vary based on the type of the scaledArrowVector.
-        // MAgnitude will be represented by the arrowLength of the arrow, but also by a numerical label.
-
-        // Implementation details:
-        // - This system should run after the DynamicBodySystem, so that it can access the updated physics data for each DynamicBody.
-        // - Required components:
-        //     - Transform2
-        //     - DynamicBody
-        // - Initialize():
-        //     - Generate a 1 pixel white stock texture that can be resized procedurally to create a dynamic arrow for all vectors, scaling and rotating it appropriately for each scaledArrowVector's magnitude and direction.
-        //         - It can be resized, rotated, and recoloured as part of SpriteBatch.Draw().
-        //         - To make an arrow, just stretch the pixel to its arrowLength, and add two short stretched pixels (i.e. rectangles) on the end (45 or 30 degrees from the shaft? Although remember MonoGame works in radians (I think)).
-        // - Draw():
-        //     - [Note: Add most of the below logic to a DrawArrowShaft() function]
-        //     - [Note: needs to be toggelable, via a keypress or something (maybe it cycles between On -> Forces -> Accelerations -> Velocities -> On -> ...).]
-        //         - Look into whether it's possible to toggle the system on and off without having to add/remove it from the world, as that would be more efficient than having to add/remove it every time the user wants to toggle it.
-        //     - For each DynamicBody, retrieve its velocity, acceleration, and forces acting upon it, calculating the resultant force accordingly.
-        //     - For each scaledArrowVector, calculate the appropriate arrowLength and direction for the arrow based on its magnitude and direction.
-        //         - Have some cap on the size of arrows (depending on the largest arrow) and resize all other arrows to be less than that, keeping their relative sizes.
-        //     - Render the arrow at the position of the DynamicBody.
-        //     - Arrow Colours:
-        //         - Forces: Red
-        //         - Acceleration: Green
-        //         - Velocity: Blue
-
-        // - Think about how to handle multiple forces acting in the same direction on the same object.
-        // - Maybe each arrow can be offset slightly from the centre of the object, so they don't completely overlap and become indistinguishable.
-        //     - Todo: figure out how to dynamically handle this with any number of forces, and with forces at any rotation.
-        // - The resultant force arrow can be rendered directly on top of the object, as it's the most important one to visualize.
     }
 }
