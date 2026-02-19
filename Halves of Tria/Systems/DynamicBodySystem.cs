@@ -32,6 +32,7 @@ namespace Halves_of_Tria.Systems
             Transform2 transform = _transformMapper.Get(entityId);
 
             UpdateKinematics(dynamicBody, transform, gameTime);
+
             StopIfOnFloor(dynamicBody, transform);
         }
         #endregion
@@ -46,14 +47,25 @@ namespace Halves_of_Tria.Systems
 
 
             // [Note: this doesn't work currently]
-            //if (transform.Position.Y >= Game1.FloorLevel * 720)
-            //{
-            //    int normalForceIndex = dynamicBody.Forces.FindIndex(x => x.Type == ForceType.Normal);
-            //    Vector2 gravitationalForce = dynamicBody.Forces.Find(x => x.Type == ForceType.Gravitational).Value;
+            Debug.WriteLine($"Position: {transform.Position.Y}; Floor level: {Game1.FloorLevel * 720}");
 
-            //    Force newNormalForce = new(ForceType.Normal, -gravitationalForce);
-            //    UpdateForce(dynamicBody, newNormalForce);
-            //}
+            if (transform.Position.Y >= Game1.FloorLevel * 720)
+            {
+                Debug.WriteLine("~ ~ Colliding with floor ~ ~");
+                int normalForceIndex = dynamicBody.Forces.FindIndex(x => x.Type == ForceType.Normal);
+
+
+
+
+
+                foreach (Force force in dynamicBody.Forces)
+                {
+                    Debug.WriteLine($"Force Type: {force.Type}; Value: {force.Value}");
+                }
+
+                Force newNormalForce = new(ForceType.Normal, new(0, -dynamicBody.ResultantForce.Y));
+                UpdateForce(dynamicBody, newNormalForce);
+            }
         }
         #endregion
 
@@ -80,7 +92,8 @@ namespace Halves_of_Tria.Systems
 
         private void ApplyForces(DynamicBody dynamicBody, Transform2 transform, float deltaTime)
         {
-            dynamicBody.Acceleration = GetResultantForce(dynamicBody) * dynamicBody.InverseMass;
+
+            dynamicBody.Acceleration = dynamicBody.ResultantForce * dynamicBody.InverseMass;
             dynamicBody.Velocity += dynamicBody.Acceleration * deltaTime;
             transform.Position += dynamicBody.Velocity * deltaTime;
         }

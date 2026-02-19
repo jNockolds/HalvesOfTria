@@ -51,6 +51,7 @@ namespace Halves_of_Tria.Components
             Mass = mass; // mass updates the gravitational force when changed, so this needs to be assigned after the gravitational force is added
             Velocity = Vector2.Zero;
             Acceleration = Vector2.Zero;
+            ResultantForce = Vector2.Zero;
             UnspentImpulse = Vector2.Zero;
         }
 

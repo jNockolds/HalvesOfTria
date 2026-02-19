@@ -46,7 +46,7 @@ namespace Halves_of_Tria
         // test variables:
         private Vector2 _saltInitialPosition;
         private Texture2D _saltTexture;
-        public static float FloorLevel = 0.8f; // as a proportion of the window's height
+        public static float FloorLevel = 0.6f; // as a proportion of the window's height
         // end of test variables
 
         public Game1()
