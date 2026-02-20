@@ -1,7 +1,7 @@
 {
   "GravitationalAcceleration": {
-    "X": 4,
-    "Y": 9.81
+    "X": 0,
+    "Y": 90
   },
   "DefaultLinearDragCoefficient": 0.1,
   "TestProperty": "This is a test."

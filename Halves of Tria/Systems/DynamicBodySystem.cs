@@ -31,40 +31,36 @@ namespace Halves_of_Tria.Systems
             DynamicBody dynamicBody = _dynamicBodyMapper.Get(entityId);
             Transform2 transform = _transformMapper.Get(entityId);
 
+
             UpdateKinematics(dynamicBody, transform, gameTime);
 
-            StopIfOnFloor(dynamicBody, transform);
+            BounceIfOnFloor(dynamicBody, transform);
+
         }
         #endregion
 
         #region Temporary Methods
-        private void StopIfOnFloor(DynamicBody dynamicBody, Transform2 transform)
+        private void BounceIfOnFloor(DynamicBody dynamicBody, Transform2 transform)
         {
-            // [How it should actually work: calculate the force the object is pushing into the obstacle with and apply that force in the opposite direction.
-            // This essentially removes the component of the DynamicBody's resultant force along the collision normal, allowing the object to still slide agaionst the object.
-            // I will also need to clamp the DynamicBody's position so that they can't pass through the object.
-            // Also make sure to account for the size of the DynamicBody, not just its position (but we're being lazy at the moment, so it's fine for now).]
-
-
-            // [Note: this doesn't work currently]
+            // [Note: Maybe this works? The way the normal force doesn't ever zero feels weird?]
+            // [Updated Note (after commenting out the normal force stuff): this works, but it's jittery when landing;
+            // it'll do for now until the actual environmental box is implemented]
             Debug.WriteLine($"Position: {transform.Position.Y}; Floor level: {Game1.FloorLevel * 720}");
 
             if (transform.Position.Y >= Game1.FloorLevel * 720)
             {
-                Debug.WriteLine("~ ~ Colliding with floor ~ ~");
-                int normalForceIndex = dynamicBody.Forces.FindIndex(x => x.Type == ForceType.Normal);
+                //int normalForceIndex = dynamicBody.Forces.FindIndex(x => x.Type == ForceType.Normal);
 
+                //Force newNormalForce = new(ForceType.Normal, new(0, -dynamicBody.ResultantForce.Y));
 
+                //UpdateForce(dynamicBody, newNormalForce);
 
-
-
-                foreach (Force force in dynamicBody.Forces)
-                {
-                    Debug.WriteLine($"Force Type: {force.Type}; Value: {force.Value}");
-                }
-
-                Force newNormalForce = new(ForceType.Normal, new(0, -dynamicBody.ResultantForce.Y));
-                UpdateForce(dynamicBody, newNormalForce);
+                dynamicBody.Velocity = new(dynamicBody.Velocity.X, -dynamicBody.Velocity.Y);
+            }
+            else
+            { 
+                //Force newNormalForce = new(ForceType.Normal, Vector2.Zero);
+                //UpdateForce(dynamicBody, newNormalForce);
             }
         }
         #endregion
