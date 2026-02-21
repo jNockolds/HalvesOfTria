@@ -39,11 +39,10 @@ namespace Halves_of_Tria.Components
 
         public DynamicBody(float mass)
         {
-            Forces = new();
+            InitializeForces(); // Ensures that every ForceType is in Forces
 
-            Forces.Add(ForceType.Gravitational, mass * Config.GravitationalAcceleration);
-            Forces.Add(ForceType.LinearDrag, -Config.DefaultLinearDragCoefficient * Velocity);
-            Forces.Add(ForceType.Normal, Vector2.Zero);
+            Forces[ForceType.Gravitational] = mass * Config.GravitationalAcceleration;
+            Forces[ForceType.LinearDrag] = -Config.DefaultLinearDragCoefficient * Velocity;
 
             Mass = mass; // mass updates the gravitational force when changed, so this needs to be assigned after the gravitational force is added
             Velocity = Vector2.Zero;
@@ -53,6 +52,15 @@ namespace Halves_of_Tria.Components
         }
 
         #region Helper Methods
+        private void InitializeForces()
+        {
+            Forces = new();
+            foreach (ForceType forceType in Enum.GetValues(typeof(ForceType)))
+            {
+                Forces.Add(forceType, Vector2.Zero);
+            }
+        }
+
         private void UpdateMassRelatedProperties(float newMass)
         {
             InverseMass = 1f / newMass;

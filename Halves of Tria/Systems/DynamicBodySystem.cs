@@ -120,14 +120,7 @@ namespace Halves_of_Tria.Systems
 
         private void UpdateForce(DynamicBody dynamicBody, ForceType forceType, Vector2 newValue, bool updateResultantForceAfter = true)
         {
-            if (!dynamicBody.Forces.ContainsKey(forceType))
-            {
-                dynamicBody.Forces.Add(forceType, newValue);
-            }
-            else
-            {
-                dynamicBody.Forces[forceType] = newValue;
-            }
+            dynamicBody.Forces[forceType] = newValue;
 
             if (updateResultantForceAfter)
             {
@@ -162,29 +155,6 @@ namespace Halves_of_Tria.Systems
             }
 
             UpdateResultantForce(dynamicBody);
-        }
-
-        private void AddForce(DynamicBody dynamicBody, ForceType forceType, Vector2 value)
-        {
-            dynamicBody.Forces.Add(forceType, value);
-        }
-
-        private void ZeroForce(DynamicBody dynamicBody, ForceType forceType)
-        {
-            if (!dynamicBody.Forces.ContainsKey(forceType))
-            {
-                throw new ArgumentException($"The specified force type ({forceType}) does not exist in the DynamicBody's forces.", nameof(forceType));
-            }
-            dynamicBody.Forces[forceType] = Vector2.Zero;
-        }
-
-        private void RemoveForce(DynamicBody dynamicBody, ForceType forceType)
-        {
-            if (!dynamicBody.Forces.ContainsKey(forceType))
-            {
-                throw new ArgumentException($"The specified force type ({forceType}) does not exist in the DynamicBody's forces.", nameof(forceType));
-            }
-            dynamicBody.Forces.Remove(forceType);
         }
 
         private void ClearImpulses(DynamicBody dynamicBody)
