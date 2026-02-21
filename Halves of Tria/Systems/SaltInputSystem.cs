@@ -38,7 +38,6 @@ namespace Halves_of_Tria.Systems
         #region Helper Methods
         private void DebugMoveOnInput(Transform2 transform)
         {
-            Debug.WriteLine("Attempting Debug Mpve");
             if (InputHandler.IsActionDown(InputAction.SaltDebugMove))
             {
                 Vector2 mousePosition = InputHandler.GetMousePosition();

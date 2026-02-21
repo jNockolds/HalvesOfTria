@@ -15,7 +15,8 @@ namespace Halves_of_Tria.Systems
         private ComponentMapper<DynamicBody> _dynamicBodyMapper;
         private ComponentMapper<Transform2> _transformMapper;
 
-        private float _restitutionCoeff = 0.2f;
+        private float _requiredYVelocityForBounce = 200;
+        private float _bounceIntensity = 50;
         #endregion
 
         public DynamicBodySystem()
@@ -36,38 +37,44 @@ namespace Halves_of_Tria.Systems
 
             UpdateKinematics(dynamicBody, transform, gameTime);
 
-            BounceIfOnFloor(dynamicBody, transform);
+            ReactIfOnFloor(dynamicBody, transform);
+
+            UpdateAllDynamicForces(dynamicBody, transform);
 
         }
         #endregion
 
-        #region Temporary Methods
-        private void BounceIfOnFloor(DynamicBody dynamicBody, Transform2 transform)
+        #region Public Methods
+        public void AddImpulse(DynamicBody dynamicBody, Vector2 impulse)
         {
-            // [Note: Maybe this works? The way the normal force doesn't ever zero feels weird?]
-            // [Updated Note (after commenting out the normal force stuff): this works, but it's jittery when landing;
-            // it'll do for now until the actual environmental box is implemented]
+            dynamicBody.UnspentImpulse += impulse;
+        }
+        #endregion
 
-            // [Idea: instead of setting Velocity.Y to a multiple of its previous value to simulate a bounce,
-            // just set it to zero unless Velocity.Y is above a certain threshold.
-            // In which case, set it to a pre-defined "bounce velocity" number.
-            // Or, better yet, set it to zero always, and add a "bounce impulse" if Velocity.Y is above the threshold.
 
-            if (transform.Position.Y >= GameHost.FloorLevel * 720)
+
+
+        #region Temporary Methods
+        private void ReactIfOnFloor(DynamicBody dynamicBody, Transform2 transform)
+        {
+            float floorY = GameHost.FloorLevel * 720;
+
+            if (transform.Position.Y < floorY)
             {
-                //int normalForceIndex = dynamicBody.Forces.FindIndex(x => x.Type == ForceType.Normal);
-
-                //Force newNormalForce = new(ForceType.Normal, new(0, -dynamicBody.ResultantForce.Y));
-
-                //UpdateForce(dynamicBody, newNormalForce);
-
-                dynamicBody.Velocity = new(dynamicBody.Velocity.X, -_restitutionCoeff * dynamicBody.Velocity.Y);
+                return;
             }
-            else
-            { 
-                //Force newNormalForce = new(ForceType.Normal, Vector2.Zero);
-                //UpdateForce(dynamicBody, newNormalForce);
+
+            transform.Position = new Vector2(transform.Position.X, floorY);
+
+            float impactVelocity = dynamicBody.Velocity.Y;
+
+            if (impactVelocity >= _requiredYVelocityForBounce)
+            {
+                AddImpulse(dynamicBody, new Vector2(0, -_bounceIntensity));
             }
+
+            dynamicBody.Velocity = new(dynamicBody.Velocity.X, 0);
+            dynamicBody.Acceleration = new(dynamicBody.Acceleration.X, 0);
         }
         #endregion
 
@@ -81,9 +88,8 @@ namespace Halves_of_Tria.Systems
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             ApplyImpulses(dynamicBody);
+            UpdateAllDynamicForces(dynamicBody, transform);
             ApplyForces(dynamicBody, transform, deltaTime);
-            UpdateAllDynamicForces(dynamicBody);
-            dynamicBody.ResultantForce = GetResultantForce(dynamicBody);
         }
 
         private void ApplyImpulses(DynamicBody dynamicBody)
@@ -99,7 +105,7 @@ namespace Halves_of_Tria.Systems
             dynamicBody.Velocity += dynamicBody.Acceleration * deltaTime;
             transform.Position += dynamicBody.Velocity * deltaTime;
 
-            Debug.WriteLine($"Acceleration: {dynamicBody.Acceleration}; Velocity: {dynamicBody.Velocity}");
+            Debug.WriteLine($"Position: {transform.Position}, Velocity: {dynamicBody.Velocity}, Acceleration: {dynamicBody.Acceleration}");
         }
 
         private Vector2 GetResultantForce(DynamicBody dynamicBody)
@@ -112,32 +118,58 @@ namespace Halves_of_Tria.Systems
             return totalForce;
         }
 
-        public void UpdateForce(DynamicBody dynamicBody, ForceType forceType, Vector2 newValue)
+        private void UpdateForce(DynamicBody dynamicBody, ForceType forceType, Vector2 newValue, bool updateResultantForceAfter = true)
         {
             if (!dynamicBody.Forces.ContainsKey(forceType))
             {
                 dynamicBody.Forces.Add(forceType, newValue);
-                return;
+            }
+            else
+            {
+                dynamicBody.Forces[forceType] = newValue;
             }
 
-            dynamicBody.Forces[forceType] = newValue;
+            if (updateResultantForceAfter)
+            {
+                UpdateResultantForce(dynamicBody);
+            }
         }
 
-        public void UpdateAllDynamicForces(DynamicBody dynamicBody)
+        private void UpdateAllDynamicForces(DynamicBody dynamicBody, Transform2 transform)
         {
             Vector2 newLinearDrag = -Config.DefaultLinearDragCoefficient * dynamicBody.Velocity;
-            UpdateForce(dynamicBody, ForceType.LinearDrag, newLinearDrag);
+            UpdateForce(dynamicBody, ForceType.LinearDrag, newLinearDrag, false); // false to prevent repeated redundant updating when more forces are updated here
+
+            float floorY = GameHost.FloorLevel * 720;
+
+            if (transform.Position.Y >= floorY)
+            {
+                // Sum vertical components of all forces except Normal
+                float nonNormalVerticalForces = 0f;
+                foreach (var force in dynamicBody.Forces)
+                {
+                    if (force.Key == ForceType.Normal) continue;
+                    nonNormalVerticalForces += force.Value.Y;
+                }
+
+                // Normal should exactly cancel other vertical forces while on the floor.
+                Vector2 normalForce = new Vector2(0f, -nonNormalVerticalForces);
+                UpdateForce(dynamicBody, ForceType.Normal, normalForce, false);
+            }
+            else
+            {
+                UpdateForce(dynamicBody, ForceType.Normal, Vector2.Zero, false);
+            }
+
+            UpdateResultantForce(dynamicBody);
         }
 
-
-        // Most of the following methods are not being used yet, but they could be useful when there are impulses and temporary forces in play:
-
-        public void AddForce(DynamicBody dynamicBody, ForceType forceType, Vector2 value)
+        private void AddForce(DynamicBody dynamicBody, ForceType forceType, Vector2 value)
         {
             dynamicBody.Forces.Add(forceType, value);
         }
 
-        public void ZeroForce(DynamicBody dynamicBody, ForceType forceType)
+        private void ZeroForce(DynamicBody dynamicBody, ForceType forceType)
         {
             if (!dynamicBody.Forces.ContainsKey(forceType))
             {
@@ -146,7 +178,7 @@ namespace Halves_of_Tria.Systems
             dynamicBody.Forces[forceType] = Vector2.Zero;
         }
 
-        public void RemoveForce(DynamicBody dynamicBody, ForceType forceType)
+        private void RemoveForce(DynamicBody dynamicBody, ForceType forceType)
         {
             if (!dynamicBody.Forces.ContainsKey(forceType))
             {
@@ -155,14 +187,16 @@ namespace Halves_of_Tria.Systems
             dynamicBody.Forces.Remove(forceType);
         }
 
-        public void ApplyImpulse(DynamicBody dynamicBody, Vector2 impulse)
-        {
-            dynamicBody.UnspentImpulse += impulse;
-        }
-
-        public void ClearImpulses(DynamicBody dynamicBody)
+        private void ClearImpulses(DynamicBody dynamicBody)
         {
             dynamicBody.UnspentImpulse = Vector2.Zero;
+        }
+        #endregion
+
+        #region Helper Methods
+        private void UpdateResultantForce(DynamicBody dynamicBody)
+        {
+            dynamicBody.ResultantForce = GetResultantForce(dynamicBody);
         }
         #endregion
     }
