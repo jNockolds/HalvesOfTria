@@ -3,6 +3,7 @@ using Halves_of_Tria.Input;
 using Halves_of_Tria.Textures;
 using Halves_of_Tria.Systems;
 using Halves_of_Tria.Configuration;
+using Halves_of_Tria.Factories;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -33,19 +34,18 @@ namespace Halves_of_Tria
                 _graphics.ApplyChanges();
             }
         }
+
+        public static World WorldInstance;
         #endregion
 
         #region Fields
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private World _world;
         private Entity _salt;
         #endregion
 
         // test variables:
-        private Vector2 _saltInitialPosition;
-        private Texture2D _saltTexture;
         public static float FloorLevel = 0.6f; // as a proportion of the window's height
         // end of test variables
 
@@ -70,23 +70,15 @@ namespace Halves_of_Tria
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            _world = new WorldBuilder()
+            WorldInstance = new WorldBuilder()
             .AddSystem(new RenderSystem(_spriteBatch))
             .AddSystem(new DynamicBodySystem())
             .AddSystem(new SaltMovementSystem())
             .AddSystem(new DebugVectorRenderSystem(GraphicsDevice, _spriteBatch))
             .Build();
 
-
-            _saltInitialPosition = new Vector2(WindowWidth / 2, WindowHeight / 2);
-            _saltTexture = TextureGenerator.Rectangle(GraphicsDevice, 40, 120, Color.White, true);
-
-            _salt = _world.CreateEntity();
-            _salt.Attach(new PlayerSalt());
-            _salt.Attach(_saltTexture);
-            _salt.Attach(new Transform2(_saltInitialPosition));
-            _salt.Attach(new Speed(200));
-            _salt.Attach(new DynamicBody(1));
+            Vector2 saltInitialPosition = new Vector2(640, 360);
+            PlayerFactories.CreateSalt(GraphicsDevice, saltInitialPosition);
         }
 
         protected override void Update(GameTime gameTime)
@@ -107,7 +99,7 @@ namespace Halves_of_Tria
                 saltTransform.Position = mousePosition;
             }
 
-            _world.Update(gameTime);
+            WorldInstance.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -115,7 +107,7 @@ namespace Halves_of_Tria
         {
             GraphicsDevice.Clear(Color.Gray);
 
-            _world.Draw(gameTime);
+            WorldInstance.Draw(gameTime);
             base.Draw(gameTime);
         }
         #endregion

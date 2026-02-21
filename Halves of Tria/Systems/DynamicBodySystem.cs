@@ -14,6 +14,8 @@ namespace Halves_of_Tria.Systems
         #region Fields and Components
         private ComponentMapper<DynamicBody> _dynamicBodyMapper;
         private ComponentMapper<Transform2> _transformMapper;
+
+        private float _restitutionCoeff = 0.2f;
         #endregion
 
         public DynamicBodySystem()
@@ -45,7 +47,6 @@ namespace Halves_of_Tria.Systems
             // [Note: Maybe this works? The way the normal force doesn't ever zero feels weird?]
             // [Updated Note (after commenting out the normal force stuff): this works, but it's jittery when landing;
             // it'll do for now until the actual environmental box is implemented]
-            Debug.WriteLine($"Position: {transform.Position.Y}; Floor level: {Game1.FloorLevel * 720}");
 
             if (transform.Position.Y >= Game1.FloorLevel * 720)
             {
@@ -55,7 +56,7 @@ namespace Halves_of_Tria.Systems
 
                 //UpdateForce(dynamicBody, newNormalForce);
 
-                dynamicBody.Velocity = new(dynamicBody.Velocity.X, -dynamicBody.Velocity.Y);
+                dynamicBody.Velocity = new(dynamicBody.Velocity.X, -_restitutionCoeff * dynamicBody.Velocity.Y);
             }
             else
             { 
@@ -92,6 +93,8 @@ namespace Halves_of_Tria.Systems
             dynamicBody.Acceleration = dynamicBody.ResultantForce * dynamicBody.InverseMass;
             dynamicBody.Velocity += dynamicBody.Acceleration * deltaTime;
             transform.Position += dynamicBody.Velocity * deltaTime;
+
+            Debug.WriteLine($"Acceleration: {dynamicBody.Acceleration}; Velocity: {dynamicBody.Velocity}");
         }
 
         private Vector2 GetResultantForce(DynamicBody dynamicBody)
@@ -119,6 +122,7 @@ namespace Halves_of_Tria.Systems
             Force newLinearDrag = new(ForceType.LinearDrag, -Config.DefaultLinearDragCoefficient * dynamicBody.Velocity);
             UpdateForce(dynamicBody, newLinearDrag);
         }
+
 
         // Most of the following methods are not being used yet, but they could be useful when there are impulses and temporary forces in play:
 
