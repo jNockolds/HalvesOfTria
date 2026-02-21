@@ -93,9 +93,9 @@ namespace Halves_of_Tria.Systems
                 switch (_vectorsShown)
                 {
                     case VectorType.Forces:
-                        foreach (Force force in dynamicBody.Forces)
+                        foreach (Vector2 value in dynamicBody.Forces.Values)
                         {
-                            DrawArrow(transform.Position, force.Value, _forcesColour, _forceScaleFactor);
+                            DrawArrow(transform.Position, value, _forcesColour, _forceScaleFactor);
                         }
                         break;
                     case VectorType.ResultantForce:

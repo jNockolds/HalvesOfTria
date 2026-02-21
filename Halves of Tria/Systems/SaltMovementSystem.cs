@@ -16,7 +16,7 @@ namespace Halves_of_Tria.Systems
         #endregion
 
         public SaltMovementSystem() 
-            : base(Aspect.All(typeof(Transform2)).All(typeof(Speed))) { }
+            : base(Aspect.All(typeof(Tags.Players.Salt), typeof(Transform2), typeof(Speed))) { }
 
         #region Game Loop Methods
         public override void Initialize(IComponentMapperService mapperService)
@@ -27,9 +27,26 @@ namespace Halves_of_Tria.Systems
 
         public override void Process(GameTime gameTime, int entityId)
         {
-
             Transform2 transform = _transformMapper.Get(entityId);
             Speed speed = _speedMapper.Get(entityId);
+
+            DebugMoveOnInput(transform);
+            MoveOnInput(gameTime, transform, speed);
+        }
+        #endregion
+
+        #region Helper Methods
+        private void DebugMoveOnInput(Transform2 transform)
+        {
+            Debug.WriteLine("Attempting Debug Mpve");
+            if (InputHandler.IsActionDown(InputAction.SaltDebugMove))
+            {
+                Vector2 mousePosition = InputHandler.GetMousePosition();
+                transform.Position = mousePosition;
+            }
+        }
+        private void MoveOnInput(GameTime gameTime, Transform2 transform, Speed speed)
+        {
 
             if (InputHandler.IsActionDown(InputAction.SaltWalkLeft))
             {

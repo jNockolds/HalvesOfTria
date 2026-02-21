@@ -1,10 +1,10 @@
-﻿using Halves_of_Tria;
-using Halves_of_Tria.Components;
+﻿using Halves_of_Tria.Components;
 using Halves_of_Tria.Configuration;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
+using System;
 using System.Diagnostics;
 
 namespace Halves_of_Tria.Systems
@@ -48,7 +48,7 @@ namespace Halves_of_Tria.Systems
             // [Updated Note (after commenting out the normal force stuff): this works, but it's jittery when landing;
             // it'll do for now until the actual environmental box is implemented]
 
-            if (transform.Position.Y >= Game1.FloorLevel * 720)
+            if (transform.Position.Y >= GameHost.FloorLevel * 720)
             {
                 //int normalForceIndex = dynamicBody.Forces.FindIndex(x => x.Type == ForceType.Normal);
 
@@ -77,7 +77,7 @@ namespace Halves_of_Tria.Systems
 
             ApplyImpulses(dynamicBody);
             ApplyForces(dynamicBody, transform, deltaTime);
-            UpdateForces(dynamicBody);
+            UpdateAllDynamicForces(dynamicBody);
             dynamicBody.ResultantForce = GetResultantForce(dynamicBody);
         }
 
@@ -100,55 +100,54 @@ namespace Halves_of_Tria.Systems
         private Vector2 GetResultantForce(DynamicBody dynamicBody)
         {
             Vector2 totalForce = Vector2.Zero;
-            foreach (Force force in dynamicBody.Forces)
+            foreach (Vector2 value in dynamicBody.Forces.Values)
             {
-                totalForce += force.Value;
+                totalForce += value;
             }
             return totalForce;
         }
 
-        public void UpdateForce(DynamicBody dynamicBody, Force newForce)
+        public void UpdateForce(DynamicBody dynamicBody, ForceType forceType, Vector2 newValue)
         {
-            int forceIndex = dynamicBody.Forces.FindIndex(x => x.Type == newForce.Type);
-
-            if (forceIndex >= 0) // if dynamicBody.Forces contains the force
+            if (!dynamicBody.Forces.ContainsKey(forceType))
             {
-                dynamicBody.Forces[forceIndex] = newForce;
+                dynamicBody.Forces.Add(forceType, newValue);
+                return;
             }
+
+            dynamicBody.Forces[forceType] = newValue;
         }
 
-        public void UpdateForces(DynamicBody dynamicBody)
+        public void UpdateAllDynamicForces(DynamicBody dynamicBody)
         {
-            Force newLinearDrag = new(ForceType.LinearDrag, -Config.DefaultLinearDragCoefficient * dynamicBody.Velocity);
-            UpdateForce(dynamicBody, newLinearDrag);
+            Vector2 newLinearDrag = -Config.DefaultLinearDragCoefficient * dynamicBody.Velocity;
+            UpdateForce(dynamicBody, ForceType.LinearDrag, newLinearDrag);
         }
 
 
         // Most of the following methods are not being used yet, but they could be useful when there are impulses and temporary forces in play:
 
-        public void AddForce(DynamicBody dynamicBody, Force force)
+        public void AddForce(DynamicBody dynamicBody, ForceType forceType, Vector2 value)
         {
-            int forceIndex = dynamicBody.Forces.FindIndex(x => x.Type == force.Type);
-
-            if (forceIndex < 0) // if dynamicBody.Forces doesn't already contain the force
-            {
-                dynamicBody.Forces.Add(force);
-            }
+            dynamicBody.Forces.Add(forceType, value);
         }
 
-        public void ZeroForce(DynamicBody dynamicBody, Force force)
+        public void ZeroForce(DynamicBody dynamicBody, ForceType forceType)
         {
-            int forceIndex = dynamicBody.Forces.FindIndex(x => x.Type == force.Type);
-
-            if (forceIndex >= 0) // if dynamicBody.Forces contains the force
+            if (!dynamicBody.Forces.ContainsKey(forceType))
             {
-                dynamicBody.Forces[forceIndex] = new(force.Type, Vector2.Zero);
+                throw new ArgumentException($"The specified force type ({forceType}) does not exist in the DynamicBody's forces.", nameof(forceType));
             }
+            dynamicBody.Forces[forceType] = Vector2.Zero;
         }
 
-        public void RemoveForce(DynamicBody dynamicBody, Force force)
+        public void RemoveForce(DynamicBody dynamicBody, ForceType forceType)
         {
-            dynamicBody.Forces.Remove(force);
+            if (!dynamicBody.Forces.ContainsKey(forceType))
+            {
+                throw new ArgumentException($"The specified force type ({forceType}) does not exist in the DynamicBody's forces.", nameof(forceType));
+            }
+            dynamicBody.Forces.Remove(forceType);
         }
 
         public void ApplyImpulse(DynamicBody dynamicBody, Vector2 impulse)

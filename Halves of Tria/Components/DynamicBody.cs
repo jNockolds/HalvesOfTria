@@ -34,19 +34,16 @@ namespace Halves_of_Tria.Components
         public Vector2 ResultantForce { get; set; }
         public Vector2 UnspentImpulse { get; set; }
 
-        public List<Force> Forces { get; private set; }
+        public Dictionary<ForceType, Vector2> Forces { get; private set; }
         #endregion
 
         public DynamicBody(float mass)
         {
             Forces = new();
 
-            Force gravitationalForce = new(ForceType.Gravitational, mass, Config.GravitationalAcceleration);
-            Forces.Add(gravitationalForce);
-            Force linearDrag = new(ForceType.LinearDrag, -Config.DefaultLinearDragCoefficient * Velocity);
-            Forces.Add(linearDrag);
-            Force normal = new(ForceType.Normal, Vector2.Zero);
-            Forces.Add(normal);
+            Forces.Add(ForceType.Gravitational, mass * Config.GravitationalAcceleration);
+            Forces.Add(ForceType.LinearDrag, -Config.DefaultLinearDragCoefficient * Velocity);
+            Forces.Add(ForceType.Normal, Vector2.Zero);
 
             Mass = mass; // mass updates the gravitational force when changed, so this needs to be assigned after the gravitational force is added
             Velocity = Vector2.Zero;
@@ -60,12 +57,7 @@ namespace Halves_of_Tria.Components
         {
             InverseMass = 1f / newMass;
 
-            int gravitationalForceIndex = Forces.FindIndex(x => x.Type == ForceType.Gravitational);
-            if (gravitationalForceIndex >= 0) // if Forces contains gravitational force
-            {
-                Force newGravitationalForce = new(ForceType.Gravitational, newMass, Config.GravitationalAcceleration);
-                Forces[gravitationalForceIndex] = newGravitationalForce;
-            }
+            Forces[ForceType.Gravitational] = newMass * Config.GravitationalAcceleration;
         }
         #endregion
     }

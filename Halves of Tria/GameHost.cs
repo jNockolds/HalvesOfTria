@@ -13,7 +13,7 @@ using System.Diagnostics;
 
 namespace Halves_of_Tria
 {
-    public class Game1 : Game
+    public class GameHost : Game
     {
         #region Properties
         public int WindowWidth
@@ -41,15 +41,13 @@ namespace Halves_of_Tria
         #region Fields
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-
-        private Entity _salt;
         #endregion
 
         // test variables:
         public static float FloorLevel = 0.6f; // as a proportion of the window's height
         // end of test variables
 
-        public Game1()
+        public GameHost()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -92,12 +90,6 @@ namespace Halves_of_Tria
             if (InputHandler.WasActionJustPressed(InputAction.ReloadConfig))
                 JsonLoader.LoadConfig();
 
-            if (InputHandler.IsActionDown(InputAction.SaltDebugMove))
-            {
-                Vector2 mousePosition = InputHandler.GetMousePosition();
-                Transform2 saltTransform = _salt.Get<Transform2>();
-                saltTransform.Position = mousePosition;
-            }
 
             WorldInstance.Update(gameTime);
             base.Update(gameTime);

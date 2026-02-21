@@ -19,8 +19,8 @@ namespace Halves_of_Tria.Factories
 
             Texture2D _saltTexture = TextureGenerator.Rectangle(graphicsDevice, 40, 120, Color.White, true);
 
-            Entity salt = Game1.WorldInstance.CreateEntity();
-            salt.Attach(new SaltTag());
+            Entity salt = GameHost.WorldInstance.CreateEntity();
+            salt.Attach(new Tags.Players.Salt());
             salt.Attach(_saltTexture);
             salt.Attach(new Transform2(position));
             salt.Attach(new Speed(200));
