@@ -8,14 +8,14 @@ using System.Diagnostics;
 
 namespace Halves_of_Tria.Systems
 {
-    internal class SaltMovementSystem : EntityProcessingSystem
+    internal class SaltInputSystem : EntityProcessingSystem
     {
         #region Fields and Components
         private ComponentMapper<Transform2> _transformMapper;
         private ComponentMapper<Speed> _speedMapper;
         #endregion
 
-        public SaltMovementSystem() 
+        public SaltInputSystem()
             : base(Aspect.All(typeof(Tags.Players.Salt), typeof(Transform2), typeof(Speed))) { }
 
         #region Game Loop Methods
@@ -60,4 +60,5 @@ namespace Halves_of_Tria.Systems
         }
         #endregion
     }
+
 }

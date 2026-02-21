@@ -16,6 +16,7 @@ namespace Halves_of_Tria
     public class GameHost : Game
     {
         #region Properties
+        public static GameHost Instance { get; private set; }
         public int WindowWidth
         {
             get => _graphics.PreferredBackBufferWidth;
@@ -35,7 +36,7 @@ namespace Halves_of_Tria
             }
         }
 
-        public static World WorldInstance;
+        public static World WorldInstance { get; private set; }
         #endregion
 
         #region Fields
@@ -49,6 +50,7 @@ namespace Halves_of_Tria
 
         public GameHost()
         {
+            Instance = this;
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -71,7 +73,8 @@ namespace Halves_of_Tria
             WorldInstance = new WorldBuilder()
             .AddSystem(new RenderSystem(_spriteBatch))
             .AddSystem(new DynamicBodySystem())
-            .AddSystem(new SaltMovementSystem())
+            .AddSystem(new MiscInputSystem())
+            .AddSystem(new SaltInputSystem())
             .AddSystem(new DebugVectorRenderSystem(GraphicsDevice, _spriteBatch))
             .Build();
 
@@ -82,15 +85,6 @@ namespace Halves_of_Tria
         protected override void Update(GameTime gameTime)
         {
             InputHandler.Update();
-
-            // [Todo: couple each InputAction to some code representing what it does in-game rather than hardcoding it here]
-            if (InputHandler.WasActionJustPressed(InputAction.QuickQuit))
-                Exit();
-
-            if (InputHandler.WasActionJustPressed(InputAction.ReloadConfig))
-                JsonLoader.LoadConfig();
-
-
             WorldInstance.Update(gameTime);
             base.Update(gameTime);
         }

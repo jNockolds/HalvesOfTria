@@ -48,6 +48,11 @@ namespace Halves_of_Tria.Systems
             // [Updated Note (after commenting out the normal force stuff): this works, but it's jittery when landing;
             // it'll do for now until the actual environmental box is implemented]
 
+            // [Idea: instead of setting Velocity.Y to a multiple of its previous value to simulate a bounce,
+            // just set it to zero unless Velocity.Y is above a certain threshold.
+            // In which case, set it to a pre-defined "bounce velocity" number.
+            // Or, better yet, set it to zero always, and add a "bounce impulse" if Velocity.Y is above the threshold.
+
             if (transform.Position.Y >= GameHost.FloorLevel * 720)
             {
                 //int normalForceIndex = dynamicBody.Forces.FindIndex(x => x.Type == ForceType.Normal);
