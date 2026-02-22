@@ -24,6 +24,7 @@ namespace Halves_of_Tria.Factories
             salt.Attach(_saltTexture);
             salt.Attach(new Transform2(position));
             salt.Attach(new Speed(200));
+            ///salt.Attach(new AxisAlignedRectCollider());
             salt.Attach(new DynamicBody(1));
 
             return salt.Id;
