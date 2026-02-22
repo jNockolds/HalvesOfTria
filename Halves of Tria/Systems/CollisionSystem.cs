@@ -1,22 +1,44 @@
 ﻿using Halves_of_Tria.Components;
+using Microsoft.Xna.Framework;
+using MonoGame.Extended;
+using MonoGame.Extended.ECS;
+using MonoGame.Extended.ECS.Systems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
-using MonoGame.Extended;
 
 namespace Halves_of_Tria.Systems
 {
-    internal class CollisionSystem
+    internal class CollisionSystem : EntityUpdateSystem
     {
 
+        #region Fields and Components
+        private ComponentMapper<AxisAlignedRectCollider> _axisAlignedRectColliderMapper;
+        private ComponentMapper<CircleCollider> _circleColliderMapper;
+        private ComponentMapper<CapsuleCollider> _capsuleColliderMapper;
+        private ComponentMapper<Transform2> _transformMapper;
+        #endregion
 
+        public CollisionSystem()
+            : base(Aspect.All(typeof(Transform2))
+                  .One(typeof(AxisAlignedRectCollider), typeof(CircleCollider), typeof(CapsuleCollider))) { }
+        
+        #region Game Loop Methods
+        public override void Initialize(IComponentMapperService mapperService)
+        {
+            _axisAlignedRectColliderMapper = mapperService.GetMapper<AxisAlignedRectCollider>();
+            _circleColliderMapper = mapperService.GetMapper<CircleCollider>();
+            _capsuleColliderMapper = mapperService.GetMapper<CapsuleCollider>();
+            _transformMapper = mapperService.GetMapper<Transform2>();
+        }
 
-
-
-
+        public override void Update(GameTime gameTime)
+        {
+            
+        }
+        #endregion
 
         #region Collision Dectection Methods
         public bool Intersects(Transform2 transform1, CircleCollider circle1, Transform2 transform2, CircleCollider circle2)
