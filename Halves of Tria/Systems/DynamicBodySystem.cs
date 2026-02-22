@@ -34,13 +34,11 @@ namespace Halves_of_Tria.Systems
             DynamicBody dynamicBody = _dynamicBodyMapper.Get(entityId);
             Transform2 transform = _transformMapper.Get(entityId);
 
-
             UpdateKinematics(dynamicBody, transform, gameTime);
 
             ReactIfOnFloor(dynamicBody, transform);
 
             UpdateAllDynamicForces(dynamicBody, transform);
-
         }
         #endregion
 

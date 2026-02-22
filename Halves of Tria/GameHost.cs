@@ -72,6 +72,7 @@ namespace Halves_of_Tria
 
             WorldInstance = new WorldBuilder()
             .AddSystem(new RenderSystem(_spriteBatch))
+            .AddSystem(new CollisionSystem())
             .AddSystem(new DynamicBodySystem())
             .AddSystem(new MiscInputSystem())
             .AddSystem(new SaltInputSystem())

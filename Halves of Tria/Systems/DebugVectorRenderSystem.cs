@@ -85,7 +85,7 @@ namespace Halves_of_Tria.Systems
 
             _spriteBatch.Begin();
 
-            foreach (var entityId in ActiveEntities)
+            foreach (int entityId in ActiveEntities)
             {
                 Transform2 transform = _transformMapper.Get(entityId);
                 DynamicBody dynamicBody = _dynamicBodyMapper.Get(entityId);
