@@ -4,6 +4,7 @@ using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
 using System.Diagnostics;
+using System;
 
 namespace Halves_of_Tria.Systems
 {
@@ -137,6 +138,9 @@ namespace Halves_of_Tria.Systems
         #endregion
 
         #region Collision Dectection Methods
+        // To Implement later on: 
+        // - Broad-phase and then narrow-phase checks for collisions (for optimisation, but only if needed)
+
         // To Implement:
         // - Rect-Rect
         // - Capsule-Capsule
@@ -145,7 +149,11 @@ namespace Halves_of_Tria.Systems
 
         public bool Intersects(Transform2 transform1, AxisAlignedRectCollider rect1, Transform2 transform2, AxisAlignedRectCollider rect2)
         {
-            return false; // [placeholder]
+            float horizontalDistance = Math.Abs(transform1.Position.X - transform2.Position.X);
+            float verticalDistance = Math.Abs(transform1.Position.Y - transform2.Position.Y);
+
+            return horizontalDistance <= 0.5f * (rect1.Width + rect2.Width) 
+                && verticalDistance <= 0.5f * (rect1.Height + rect2.Height);
         }
 
         public bool Intersects(Transform2 transform1, CircleCollider circle1, Transform2 transform2, CircleCollider circle2)

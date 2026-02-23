@@ -71,11 +71,11 @@ namespace Halves_of_Tria
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             WorldInstance = new WorldBuilder()
-            .AddSystem(new RenderSystem(_spriteBatch))
-            .AddSystem(new CollisionSystem())
-            .AddSystem(new DynamicBodySystem())
-            .AddSystem(new MiscInputSystem())
             .AddSystem(new SaltInputSystem())
+            .AddSystem(new MiscInputSystem())
+            .AddSystem(new CollisionDetectionSystem())
+            .AddSystem(new DynamicBodySystem())
+            .AddSystem(new RenderSystem(_spriteBatch))
             .AddSystem(new DebugVectorRenderSystem(GraphicsDevice, _spriteBatch))
             .Build();
 
