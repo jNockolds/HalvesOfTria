@@ -1,9 +1,10 @@
-﻿using Halves_of_Tria.Components;
-using Halves_of_Tria.Input;
-using Halves_of_Tria.Textures;
-using Halves_of_Tria.Systems;
+﻿using Halves_of_Tria.Caches;
+using Halves_of_Tria.Components;
 using Halves_of_Tria.Configuration;
 using Halves_of_Tria.Factories;
+using Halves_of_Tria.Input;
+using Halves_of_Tria.Systems;
+using Halves_of_Tria.Textures;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -69,18 +70,22 @@ namespace Halves_of_Tria
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            CollisionsCache collisionsCache = new();
 
             WorldInstance = new WorldBuilder()
             .AddSystem(new SaltInputSystem())
             .AddSystem(new MiscInputSystem())
-            .AddSystem(new CollisionDetectionSystem())
+            .AddSystem(new CollisionDetectionSystem(collisionsCache))
+            // [physics-related collision response systems go here]
+            // [non-physics-related collision response systems go here]
             .AddSystem(new DynamicBodySystem())
             .AddSystem(new RenderSystem(_spriteBatch))
             .AddSystem(new DebugVectorRenderSystem(GraphicsDevice, _spriteBatch))
             .Build();
 
-            Vector2 saltInitialPosition = new Vector2(640, 360);
-            PlayerFactories.CreateSalt(GraphicsDevice, saltInitialPosition);
+
+            PlayerFactories.CreateSalt(GraphicsDevice, new(WindowWidth / 2, 0.2f * WindowHeight));
+            MapTileFactories.CreateRectangle(GraphicsDevice, new(WindowWidth / 2, 0.9f * WindowHeight), (int)(0.9f * WindowWidth), (int)(0.1f * WindowHeight), Color.Brown);
         }
 
         protected override void Update(GameTime gameTime)

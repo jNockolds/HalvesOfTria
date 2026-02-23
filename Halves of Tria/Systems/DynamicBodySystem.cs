@@ -36,7 +36,7 @@ namespace Halves_of_Tria.Systems
 
             UpdateKinematics(dynamicBody, transform, gameTime);
 
-            ReactIfOnFloor(dynamicBody, transform);
+            //ReactIfOnFloor(dynamicBody, transform);
 
             UpdateAllDynamicForces(dynamicBody, transform);
         }
@@ -131,26 +131,26 @@ namespace Halves_of_Tria.Systems
             Vector2 newLinearDrag = -Config.DefaultLinearDragCoefficient * dynamicBody.Velocity;
             UpdateForce(dynamicBody, ForceType.LinearDrag, newLinearDrag, false); // false to prevent repeated redundant updating when more forces are updated here
 
-            float floorY = GameHost.FloorLevel * 720;
+            //float floorY = GameHost.FloorLevel * 720;
 
-            if (transform.Position.Y >= floorY)
-            {
-                // Sum vertical components of all forces except Normal
-                float nonNormalVerticalForces = 0f;
-                foreach (var force in dynamicBody.Forces)
-                {
-                    if (force.Key == ForceType.Normal) continue;
-                    nonNormalVerticalForces += force.Value.Y;
-                }
+            //if (transform.Position.Y >= floorY)
+            //{
+            //    // Sum vertical components of all forces except Normal
+            //    float nonNormalVerticalForces = 0f;
+            //    foreach (var force in dynamicBody.Forces)
+            //    {
+            //        if (force.Key == ForceType.Normal) continue;
+            //        nonNormalVerticalForces += force.Value.Y;
+            //    }
 
-                // Normal should exactly cancel other vertical forces while on the floor.
-                Vector2 normalForce = new Vector2(0f, -nonNormalVerticalForces);
-                UpdateForce(dynamicBody, ForceType.Normal, normalForce, false);
-            }
-            else
-            {
-                UpdateForce(dynamicBody, ForceType.Normal, Vector2.Zero, false);
-            }
+            //    // Normal should exactly cancel other vertical forces while on the floor.
+            //    Vector2 normalForce = new Vector2(0f, -nonNormalVerticalForces);
+            //    UpdateForce(dynamicBody, ForceType.Normal, normalForce, false);
+            //}
+            //else
+            //{
+            //    UpdateForce(dynamicBody, ForceType.Normal, Vector2.Zero, false);
+            //}
 
             UpdateResultantForce(dynamicBody);
         }

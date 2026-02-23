@@ -1,14 +1,9 @@
 ﻿using Halves_of_Tria.Components;
-using Halves_of_Tria.Input;
 using Halves_of_Tria.Textures;
-using Halves_of_Tria.Systems;
-using Halves_of_Tria.Configuration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
-using System.Diagnostics;
-
 
 namespace Halves_of_Tria.Factories
 {
@@ -16,16 +11,18 @@ namespace Halves_of_Tria.Factories
     {
         public static int CreateSalt(GraphicsDevice graphicsDevice, Vector2 position)
         {
+            int width = 40;
+            int height = 120;
 
-            Texture2D _saltTexture = TextureGenerator.Rectangle(graphicsDevice, 40, 120, Color.White, true);
+            Texture2D saltTexture = TextureGenerator.Rectangle(graphicsDevice, width, height, Color.White, true);
 
             Entity salt = GameHost.WorldInstance.CreateEntity();
             salt.Attach(new Tags.Players.Salt());
-            salt.Attach(_saltTexture);
             salt.Attach(new Transform2(position));
-            salt.Attach(new Speed(200));
-            ///salt.Attach(new AxisAlignedRectCollider());
+            salt.Attach(new AxisAlignedRectCollider(width, height));
             salt.Attach(new DynamicBody(1));
+            salt.Attach(saltTexture);
+            salt.Attach(new Speed(200));
 
             return salt.Id;
         }

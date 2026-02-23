@@ -36,7 +36,8 @@ namespace Halves_of_Tria.Systems
             {
                 Texture2D texture = _textureMapper.Get(entityId);
                 Transform2 transform = _transformMapper.Get(entityId);
-                _spriteBatch.Draw(texture, transform.Position, Color.White);
+                Vector2 topLeft = transform.Position - 0.5f * new Vector2(texture.Width, texture.Height);
+                _spriteBatch.Draw(texture, topLeft, Color.White);
             }
 
             _spriteBatch.End();
