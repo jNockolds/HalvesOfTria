@@ -228,6 +228,36 @@ namespace Halves_of_Tria.Systems
         {
             return transform.Position + 0.5f * new Vector2(rect.Width, rect.Height);
         }
+
+        private Vector2 GetCollisionNormal(Transform2 transform1, AxisAlignedRectCollider rect1, Transform2 transform2, AxisAlignedRectCollider rect2)
+        {
+            return Vector2.Zero; // placeholder value
+        }
+
+        private Vector2 GetCollisionNormal(Transform2 transform1, CircleCollider circle1, Transform2 transform2, CircleCollider circle2)
+        {
+            return Vector2.Zero; // placeholder value
+        }
+
+        private Vector2 GetCollisionNormal(Transform2 transform1, CapsuleCollider capsule1, Transform2 transform2, CapsuleCollider capsule2)
+        { 
+            return Vector2.Zero; // placeholder value
+        }
+
+        private Vector2 GetCollisionNormal(Transform2 rectTransform, AxisAlignedRectCollider rect, Transform2 circleTransform, CircleCollider circle)
+        {
+            return Vector2.Zero; // placeholder value
+        }
+
+        private Vector2 GetCollisionNormal(Transform2 rectTransform, AxisAlignedRectCollider rect, Transform2 capsuleTransform, CapsuleCollider capsule)
+        {
+            return Vector2.Zero; // placeholder value
+        }
+
+        private Vector2 GetCollisionNormal(Transform2 circleTransform, CircleCollider circle, Transform2 capsuleTransform, CapsuleCollider capsule)
+        {
+            return Vector2.Zero; // placeholder value
+        }
         #endregion
     }
 }
