@@ -11,15 +11,15 @@ namespace Halves_of_Tria
     {
         public int EntityId1 { get; set; }
         public int EntityId2 { get; set; }
-        public Vector2 CollisionNormal { get; set; }
-        public float PenetrationDistance { get; set; }
+        public Vector2 Normal { get; set; }
+        public float Depth { get; set; }
 
-        public CollisionData(int entityId1, int entityId2, Vector2 collisionNormal, float penetrationDistance)
+        public CollisionData(int entityId1, int entityId2, Vector2 normal, float depth)
         {
             EntityId1 = entityId1;
             EntityId2 = entityId2;
-            CollisionNormal = collisionNormal;
-            PenetrationDistance = penetrationDistance;
+            Normal = normal;
+            Depth = depth;
         }
     }
 }

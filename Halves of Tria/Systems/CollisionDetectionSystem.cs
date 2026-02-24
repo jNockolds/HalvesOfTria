@@ -54,11 +54,13 @@ namespace Halves_of_Tria.Systems
                     if (_axisAlignedRectColliderMapper.TryGet(entityId1, out AxisAlignedRectCollider rect1)
                         && _axisAlignedRectColliderMapper.TryGet(entityId2, out AxisAlignedRectCollider rect2))
                     {
-                        if (Intersects(transform1, rect1, transform2, rect2))
+                        CollisionData? collisionData = GetCollisionData(
+                            entityId1, transform1, rect1,
+                            entityId2, transform2, rect2);
+                        if (collisionData is CollisionData data) // pattern matching to avoid nullable the data
                         {
                             Debug.WriteLine($"Collision detected between entities {entityId1} and {entityId2}.");
-                            CollisionData collisionData = new(); // todo: calculate collision normal and collision depth
-                            _collisionsCache.ConfirmedCollisions.Add(collisionData);
+                            _collisionsCache.ConfirmedCollisions.Add(data);
                         }
                     }
 
@@ -66,23 +68,13 @@ namespace Halves_of_Tria.Systems
                     else if (_circleColliderMapper.TryGet(entityId1, out CircleCollider circle1)
                         && _circleColliderMapper.TryGet(entityId2, out CircleCollider circle2))
                     {
-                        if (Intersects(transform1, circle1, transform2, circle2))
+                        CollisionData? collisionData = GetCollisionData(
+                            entityId1, transform1, circle1,
+                            entityId2, transform2, circle2);
+                        if (collisionData is CollisionData data) // pattern matching to avoid nullable the data
                         {
                             Debug.WriteLine($"Collision detected between entities {entityId1} and {entityId2}.");
-                            CollisionData collisionData = new(); // todo: calculate collision normal and collision depth
-                            _collisionsCache.ConfirmedCollisions.Add(collisionData);
-                        }
-                    }
-
-                    // Rect-Circle:
-                    else if (_axisAlignedRectColliderMapper.TryGet(entityId1, out AxisAlignedRectCollider rect_RC)
-                        && _circleColliderMapper.TryGet(entityId2, out CircleCollider circle_RC))
-                    {
-                        if (Intersects(transform1, rect_RC, transform2, circle_RC))
-                        {
-                            Debug.WriteLine($"Collision detected between entities {entityId1} and {entityId2}.");
-                            CollisionData collisionData = new(); // todo: calculate collision normal and collision depth
-                            _collisionsCache.ConfirmedCollisions.Add(collisionData);
+                            _collisionsCache.ConfirmedCollisions.Add(data);
                         }
                     }
 
@@ -90,11 +82,27 @@ namespace Halves_of_Tria.Systems
                     else if (_circleColliderMapper.TryGet(entityId1, out CircleCollider circle_CR)
                              && _axisAlignedRectColliderMapper.TryGet(entityId2, out AxisAlignedRectCollider rect_CR))
                     {
-                        if (Intersects(transform2, rect_CR, transform1, circle_CR))
+                        CollisionData? collisionData = GetCollisionData(
+                            entityId1, transform1, circle_CR,
+                            entityId2, transform2, rect_CR);
+                        if (collisionData is CollisionData data) // pattern matching to avoid nullable the data
                         {
                             Debug.WriteLine($"Collision detected between entities {entityId1} and {entityId2}.");
-                            CollisionData collisionData = new(); // todo: calculate collision normal and collision depth
-                            _collisionsCache.ConfirmedCollisions.Add(collisionData);
+                            _collisionsCache.ConfirmedCollisions.Add(data);
+                        }
+                    }
+
+                    // Rect-Circle:
+                    else if (_axisAlignedRectColliderMapper.TryGet(entityId1, out AxisAlignedRectCollider rect_RC)
+                        && _circleColliderMapper.TryGet(entityId2, out CircleCollider circle_RC))
+                    {
+                        CollisionData? collisionData = GetCollisionData(
+                            entityId1, transform1, circle_RC,
+                            entityId2, transform2, rect_RC);
+                        if (collisionData is CollisionData data) // pattern matching to avoid nullable the data
+                        {
+                            Debug.WriteLine($"Collision detected between entities {entityId1} and {entityId2}.");
+                            _collisionsCache.ConfirmedCollisions.Add(data);
                         }
                     }
                 }
@@ -107,37 +115,156 @@ namespace Halves_of_Tria.Systems
         // - Broad-phase and then narrow-phase checks for collisions (for optimisation, but only if needed)
 
 
-        public bool Intersects(Transform2 transform1, AxisAlignedRectCollider rect1, Transform2 transform2, AxisAlignedRectCollider rect2)
+        // circle-circle:
+        public CollisionData? GetCollisionData(
+            int entityId1, Transform2 transform1, CircleCollider circle1, 
+            int entityId2, Transform2 transform2, CircleCollider circle2)
         {
-            float horizontalDistance = Math.Abs(transform1.Position.X - transform2.Position.X);
-            float verticalDistance = Math.Abs(transform1.Position.Y - transform2.Position.Y);
+            Vector2 relativePosition = transform2.Position - transform1.Position;
+            float distance = relativePosition.Length();
+            float depth = circle1.Radius + circle2.Radius - distance;
 
-            return horizontalDistance <= 0.5f * (rect1.Width + rect2.Width) 
-                && verticalDistance <= 0.5f * (rect1.Height + rect2.Height);
+            if (depth <= 0)
+            {
+                return null;
+            }
+
+            Vector2 normal;
+
+            if (distance > 0f)
+            {
+                normal = relativePosition.NormalizedCopy();
+            }
+            else
+            {
+                normal = Vector2.UnitY;
+            }
+
+            return new(entityId1, entityId2, normal, depth);
         }
 
-        public bool Intersects(Transform2 transform1, CircleCollider circle1, Transform2 transform2, CircleCollider circle2)
-        {
-            float distanceSquared = Vector2.DistanceSquared(transform1.Position, transform2.Position);
-            float radiusSum = circle1.Radius + circle2.Radius;
-            return distanceSquared <= radiusSum * radiusSum;
-        }
-
-        public bool Intersects(Transform2 rectTransform, AxisAlignedRectCollider rect, Transform2 circleTransform, CircleCollider circle)
+        // circle-rect:
+        public CollisionData? GetCollisionData(
+            int entityId1, Transform2 circleTransform, CircleCollider circle, 
+            int entityId2, Transform2 rectTransform, AxisAlignedRectCollider rect)
         {
             Vector2 rectTopLeft = TopLeft(rectTransform, rect);
             Vector2 rectBottomRight = BottomRight(rectTransform, rect);
             Vector2 closestPointInRectToCircle = Vector2.Clamp(circleTransform.Position, rectTopLeft, rectBottomRight);
-            return Contains(circleTransform, circle, closestPointInRectToCircle);
+
+            Vector2 fromRectToCircle = circleTransform.Position - closestPointInRectToCircle;
+            float distance = fromRectToCircle.Length();
+
+            if (distance >= circle.Radius)
+            {
+                return null;
+            }
+
+            Vector2 normal;
+            float depth;
+
+            if (distance > 0f)
+            {
+                normal = Vector2.Normalize(fromRectToCircle);
+                depth = circle.Radius - distance;
+            }
+            else
+            {
+                float horizontalDepth = rect.HalfWidth - Math.Abs(circleTransform.Position.X - rectTransform.Position.X);
+                float verticalDepth = rect.HalfHeight - Math.Abs(circleTransform.Position.Y - rectTransform.Position.Y);
+
+                if (horizontalDepth < verticalDepth)
+                {
+                    depth = horizontalDepth;
+                    normal = new Vector2(Math.Sign(circleTransform.Position.X - rectTransform.Position.X), 0f);
+                }
+                else
+                {
+                    depth = verticalDepth;
+                    normal = new Vector2(0f, Math.Sign(circleTransform.Position.Y - rectTransform.Position.Y));
+                }
+            }
+            
+            return new(entityId1, entityId2, normal, depth);
         }
+
+        // rect-rect:
+        public CollisionData? GetCollisionData(
+            int entityId1, Transform2 transform1, AxisAlignedRectCollider rect1, 
+            int entityId2, Transform2 transform2, AxisAlignedRectCollider rect2)
+        {
+            float overlapX = rect1.HalfWidth + rect2.HalfWidth - Math.Abs(transform1.Position.X - transform2.Position.X);
+            if (overlapX <= 0)
+            {
+                return null;
+            }
+
+            float overlapY = rect1.HalfHeight + rect2.HalfHeight - Math.Abs(transform1.Position.Y - transform2.Position.Y);
+            if (overlapY <= 0)
+            {
+                return null;
+            }
+
+            Vector2 normal;
+            float depth;
+
+            if (overlapX < overlapY)
+            {
+                normal = new Vector2(Math.Sign(transform2.Position.X - transform1.Position.X), 0f);
+                depth = overlapX;
+            }
+            else
+            {
+                normal = new Vector2(0f, Math.Sign(transform2.Position.Y - transform1.Position.Y));
+                depth = overlapY;
+            }
+
+            return new(entityId1, entityId2, normal, depth);
+        }
+
+
+
+
+
+
+
+
+
+        // Redundant:
+
+
+        //public bool Intersects(Transform2 transform1, AxisAlignedRectCollider rect1, Transform2 transform2, AxisAlignedRectCollider rect2)
+        //{
+        //    float horizontalDistance = Math.Abs(transform1.Position.X - transform2.Position.X);
+        //    float verticalDistance = Math.Abs(transform1.Position.Y - transform2.Position.Y);
+
+        //    return horizontalDistance <= 0.5f * (rect1.Width + rect2.Width) 
+        //        && verticalDistance <= 0.5f * (rect1.Height + rect2.Height);
+        //}
+
+        //public bool Intersects(Transform2 transform1, CircleCollider circle1, Transform2 transform2, CircleCollider circle2)
+        //{
+        //    float distanceSquared = Vector2.DistanceSquared(transform1.Position, transform2.Position);
+        //    float radiusSum = circle1.Radius + circle2.Radius;
+        //    return distanceSquared <= radiusSum * radiusSum;
+        //}
+
+        //public bool Intersects(Transform2 rectTransform, AxisAlignedRectCollider rect, Transform2 circleTransform, CircleCollider circle)
+        //{
+        //    Vector2 rectTopLeft = TopLeft(rectTransform, rect);
+        //    Vector2 rectBottomRight = BottomRight(rectTransform, rect);
+        //    Vector2 closestPointInRectToCircle = Vector2.Clamp(circleTransform.Position, rectTopLeft, rectBottomRight);
+        //    return Contains(circleTransform, circle, closestPointInRectToCircle);
+        //}
+        
         #endregion
 
         #region Helper Methods
-        private bool Contains(Transform2 transform, CircleCollider circle, Vector2 point)
-        {
-            float distanceSquared = Vector2.DistanceSquared(transform.Position, point);
-            return distanceSquared <= circle.RadiusSquared;
-        }
+        //private bool Contains(Transform2 transform, CircleCollider circle, Vector2 point)
+        //{
+        //    float distanceSquared = Vector2.DistanceSquared(transform.Position, point);
+        //    return distanceSquared <= circle.RadiusSquared;
+        //}
 
         private Vector2 TopLeft(Transform2 transform, AxisAlignedRectCollider rect)
         {
@@ -146,23 +273,6 @@ namespace Halves_of_Tria.Systems
         private Vector2 BottomRight(Transform2 transform, AxisAlignedRectCollider rect)
         {
             return transform.Position + 0.5f * new Vector2(rect.Width, rect.Height);
-        }
-
-        // Collision normal getters:
-
-        private Vector2 GetCollisionNormal(Transform2 transform1, AxisAlignedRectCollider rect1, Transform2 transform2, AxisAlignedRectCollider rect2)
-        {
-            return Vector2.Zero; // placeholder value
-        }
-
-        private Vector2 GetCollisionNormal(Transform2 transform1, CircleCollider circle1, Transform2 transform2, CircleCollider circle2)
-        {
-            return Vector2.Zero; // placeholder value
-        }
-
-        private Vector2 GetCollisionNormal(Transform2 rectTransform, AxisAlignedRectCollider rect, Transform2 circleTransform, CircleCollider circle)
-        {
-            return Vector2.Zero; // placeholder value
         }
         #endregion
     }
