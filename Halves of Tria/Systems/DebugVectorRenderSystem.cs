@@ -30,7 +30,7 @@ namespace Halves_of_Tria.Systems
 
         #region Fields and Components
         private ComponentMapper<Transform2> _transformMapper;
-        private ComponentMapper<DynamicBody> _dynamicBodyMapper;
+        private ComponentMapper<PhysicsBody> _dynamicBodyMapper;
 
         private GraphicsDevice _graphicsDevice;
         private SpriteBatch _spriteBatch;
@@ -55,7 +55,7 @@ namespace Halves_of_Tria.Systems
         #endregion
 
         public DebugVectorRenderSystem(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
-            : base(Aspect.All(typeof(Transform2), typeof(DynamicBody)))
+            : base(Aspect.All(typeof(Transform2), typeof(PhysicsBody)))
         {
             _graphicsDevice = graphicsDevice;
             _spriteBatch = spriteBatch;
@@ -65,7 +65,7 @@ namespace Halves_of_Tria.Systems
         public override void Initialize(IComponentMapperService mapperService)
         {
             _transformMapper = mapperService.GetMapper<Transform2>();
-            _dynamicBodyMapper = mapperService.GetMapper<DynamicBody>();
+            _dynamicBodyMapper = mapperService.GetMapper<PhysicsBody>();
 
             _vectorsShown = 0;
             _pixel = TextureGenerator.Pixel(_graphicsDevice, Color.White);
@@ -88,7 +88,7 @@ namespace Halves_of_Tria.Systems
             foreach (int entityId in ActiveEntities)
             {
                 Transform2 transform = _transformMapper.Get(entityId);
-                DynamicBody dynamicBody = _dynamicBodyMapper.Get(entityId);
+                PhysicsBody dynamicBody = _dynamicBodyMapper.Get(entityId);
 
                 switch (_vectorsShown)
                 {

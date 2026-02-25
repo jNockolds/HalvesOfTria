@@ -9,12 +9,15 @@ using System;
 
 namespace Halves_of_Tria.Systems
 {
+    // To Implement later on: 
+    // - Broad-phase and then narrow-phase checks for collisions (for optimisation, but only if needed)
     internal class CollisionDetectionSystem : EntityUpdateSystem
     {
         #region Fields and Components
         private ComponentMapper<AxisAlignedRectCollider> _axisAlignedRectColliderMapper;
         private ComponentMapper<CircleCollider> _circleColliderMapper;
         private ComponentMapper<Transform2> _transformMapper;
+        private ComponentMapper<PhysicsBody> _physicsBodyMapper;
 
         private readonly CollisionsCache _collisionsCache;
         #endregion
@@ -42,12 +45,6 @@ namespace Halves_of_Tria.Systems
 
                 for (int entityId2 = entityId1 + 1; entityId2 < ActiveEntities.Count; entityId2++)
                 {
-                    //if (!_dynamicBodyMapper.Has(entityId1)
-                    //    && !_dynamicBodyMapper.Has(entityId2)) // if neither has a DynamicBody, then neither needs to be updated
-                    //{
-                    //    continue;
-                    //}
-
                     Transform2 transform2 = _transformMapper.Get(entityId2);
 
                     // Rect-Rect:
@@ -57,7 +54,7 @@ namespace Halves_of_Tria.Systems
                         CollisionData? collisionData = GetCollisionData(
                             entityId1, transform1, rect1,
                             entityId2, transform2, rect2);
-                        if (collisionData is CollisionData data) // pattern matching to avoid nullable the data
+                        if (collisionData is CollisionData data) // pattern matching to avoid null data
                         {
                             Debug.WriteLine($"Collision detected between entities {entityId1} and {entityId2}.");
                             _collisionsCache.ConfirmedCollisions.Add(data);
@@ -71,7 +68,7 @@ namespace Halves_of_Tria.Systems
                         CollisionData? collisionData = GetCollisionData(
                             entityId1, transform1, circle1,
                             entityId2, transform2, circle2);
-                        if (collisionData is CollisionData data) // pattern matching to avoid nullable the data
+                        if (collisionData is CollisionData data) // pattern matching to avoid null data
                         {
                             Debug.WriteLine($"Collision detected between entities {entityId1} and {entityId2}.");
                             _collisionsCache.ConfirmedCollisions.Add(data);
@@ -85,7 +82,7 @@ namespace Halves_of_Tria.Systems
                         CollisionData? collisionData = GetCollisionData(
                             entityId1, transform1, circle_CR,
                             entityId2, transform2, rect_CR);
-                        if (collisionData is CollisionData data) // pattern matching to avoid nullable the data
+                        if (collisionData is CollisionData data) // pattern matching to avoid null data
                         {
                             Debug.WriteLine($"Collision detected between entities {entityId1} and {entityId2}.");
                             _collisionsCache.ConfirmedCollisions.Add(data);
@@ -99,7 +96,7 @@ namespace Halves_of_Tria.Systems
                         CollisionData? collisionData = GetCollisionData(
                             entityId1, transform1, circle_RC,
                             entityId2, transform2, rect_RC);
-                        if (collisionData is CollisionData data) // pattern matching to avoid nullable the data
+                        if (collisionData is CollisionData data) // pattern matching to avoid null data
                         {
                             Debug.WriteLine($"Collision detected between entities {entityId1} and {entityId2}.");
                             _collisionsCache.ConfirmedCollisions.Add(data);
@@ -110,13 +107,28 @@ namespace Halves_of_Tria.Systems
         }
         #endregion
 
-        #region Collision Dectection Methods
-        // To Implement later on: 
-        // - Broad-phase and then narrow-phase checks for collisions (for optimisation, but only if needed)
 
+        #region Helper Methods
+        private void ResolveCollision(Transform2 transform1, Transform2 transform2, CollisionData collisionData)
+        {
+            
+
+
+
+
+
+
+
+
+        }
+
+
+
+
+        // Collision Dectection Methods:
 
         // circle-circle:
-        public CollisionData? GetCollisionData(
+        private CollisionData? GetCollisionData(
             int entityId1, Transform2 transform1, CircleCollider circle1, 
             int entityId2, Transform2 transform2, CircleCollider circle2)
         {
@@ -144,7 +156,7 @@ namespace Halves_of_Tria.Systems
         }
 
         // circle-rect:
-        public CollisionData? GetCollisionData(
+        private CollisionData? GetCollisionData(
             int entityId1, Transform2 circleTransform, CircleCollider circle, 
             int entityId2, Transform2 rectTransform, AxisAlignedRectCollider rect)
         {
@@ -189,7 +201,7 @@ namespace Halves_of_Tria.Systems
         }
 
         // rect-rect:
-        public CollisionData? GetCollisionData(
+        private CollisionData? GetCollisionData(
             int entityId1, Transform2 transform1, AxisAlignedRectCollider rect1, 
             int entityId2, Transform2 transform2, AxisAlignedRectCollider rect2)
         {
@@ -221,50 +233,6 @@ namespace Halves_of_Tria.Systems
 
             return new(entityId1, entityId2, normal, depth);
         }
-
-
-
-
-
-
-
-
-
-        // Redundant:
-
-
-        //public bool Intersects(Transform2 transform1, AxisAlignedRectCollider rect1, Transform2 transform2, AxisAlignedRectCollider rect2)
-        //{
-        //    float horizontalDistance = Math.Abs(transform1.Position.X - transform2.Position.X);
-        //    float verticalDistance = Math.Abs(transform1.Position.Y - transform2.Position.Y);
-
-        //    return horizontalDistance <= 0.5f * (rect1.Width + rect2.Width) 
-        //        && verticalDistance <= 0.5f * (rect1.Height + rect2.Height);
-        //}
-
-        //public bool Intersects(Transform2 transform1, CircleCollider circle1, Transform2 transform2, CircleCollider circle2)
-        //{
-        //    float distanceSquared = Vector2.DistanceSquared(transform1.Position, transform2.Position);
-        //    float radiusSum = circle1.Radius + circle2.Radius;
-        //    return distanceSquared <= radiusSum * radiusSum;
-        //}
-
-        //public bool Intersects(Transform2 rectTransform, AxisAlignedRectCollider rect, Transform2 circleTransform, CircleCollider circle)
-        //{
-        //    Vector2 rectTopLeft = TopLeft(rectTransform, rect);
-        //    Vector2 rectBottomRight = BottomRight(rectTransform, rect);
-        //    Vector2 closestPointInRectToCircle = Vector2.Clamp(circleTransform.Position, rectTopLeft, rectBottomRight);
-        //    return Contains(circleTransform, circle, closestPointInRectToCircle);
-        //}
-        
-        #endregion
-
-        #region Helper Methods
-        //private bool Contains(Transform2 transform, CircleCollider circle, Vector2 point)
-        //{
-        //    float distanceSquared = Vector2.DistanceSquared(transform.Position, point);
-        //    return distanceSquared <= circle.RadiusSquared;
-        //}
 
         private Vector2 TopLeft(Transform2 transform, AxisAlignedRectCollider rect)
         {

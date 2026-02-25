@@ -12,7 +12,7 @@ namespace Halves_of_Tria.Systems
     internal class DynamicBodySystem : EntityProcessingSystem
     {
         #region Fields and Components
-        private ComponentMapper<DynamicBody> _dynamicBodyMapper;
+        private ComponentMapper<PhysicsBody> _dynamicBodyMapper;
         private ComponentMapper<Transform2> _transformMapper;
 
         private float _requiredYVelocityForBounce = 200;
@@ -20,68 +20,40 @@ namespace Halves_of_Tria.Systems
         #endregion
 
         public DynamicBodySystem()
-            : base(Aspect.All(typeof(DynamicBody), typeof(Transform2))) { }
+            : base(Aspect.All(typeof(PhysicsBody), typeof(Transform2))) { }
 
         #region Game Loop Methods
         public override void Initialize(IComponentMapperService mapperService)
         {
-            _dynamicBodyMapper = mapperService.GetMapper<DynamicBody>();
+            _dynamicBodyMapper = mapperService.GetMapper<PhysicsBody>();
             _transformMapper = mapperService.GetMapper<Transform2>();
         }
 
         public override void Process(GameTime gameTime, int entityId)
         {
-            DynamicBody dynamicBody = _dynamicBodyMapper.Get(entityId);
+            PhysicsBody dynamicBody = _dynamicBodyMapper.Get(entityId);
             Transform2 transform = _transformMapper.Get(entityId);
 
             UpdateKinematics(dynamicBody, transform, gameTime);
-
-            //ReactIfOnFloor(dynamicBody, transform);
 
             UpdateAllDynamicForces(dynamicBody, transform);
         }
         #endregion
 
         #region Public Methods
-        public void AddImpulse(DynamicBody dynamicBody, Vector2 impulse)
+        public void AddImpulse(PhysicsBody dynamicBody, Vector2 impulse)
         {
             dynamicBody.UnspentImpulse += impulse;
         }
         #endregion
 
 
-
-
-        #region Temporary Methods
-        private void ReactIfOnFloor(DynamicBody dynamicBody, Transform2 transform)
-        {
-            float floorY = GameHost.FloorLevel * 720;
-
-            if (transform.Position.Y < floorY)
-            {
-                return;
-            }
-
-            transform.Position = new Vector2(transform.Position.X, floorY);
-
-            float impactVelocity = dynamicBody.Velocity.Y;
-
-            if (impactVelocity >= _requiredYVelocityForBounce)
-            {
-                AddImpulse(dynamicBody, new Vector2(0, -_bounceIntensity));
-            }
-
-            dynamicBody.Velocity = new(dynamicBody.Velocity.X, 0);
-            dynamicBody.Acceleration = new(dynamicBody.Acceleration.X, 0);
-        }
-        #endregion
-
         #region Helper Methods
         /// <summary>
-        /// Updates the DynamicBody's position, velocity, and acceleration, according to set forces acting upon it.
+        /// Updates the PhysicsBody's position, velocity, and acceleration, according to set forces acting upon it.
         /// </summary>
         /// <param name="gameTime">The elapsed game time information used to calculate the time step for the update. Must not be null.</param>
-        private void UpdateKinematics(DynamicBody dynamicBody, Transform2 transform, GameTime gameTime)
+        private void UpdateKinematics(PhysicsBody dynamicBody, Transform2 transform, GameTime gameTime)
         {
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -90,23 +62,22 @@ namespace Halves_of_Tria.Systems
             ApplyForces(dynamicBody, transform, deltaTime);
         }
 
-        private void ApplyImpulses(DynamicBody dynamicBody)
+        private void ApplyImpulses(PhysicsBody dynamicBody)
         {
             dynamicBody.Velocity += dynamicBody.UnspentImpulse * dynamicBody.InverseMass;
             ClearImpulses(dynamicBody);
         }
 
-        private void ApplyForces(DynamicBody dynamicBody, Transform2 transform, float deltaTime)
+        private void ApplyForces(PhysicsBody dynamicBody, Transform2 transform, float deltaTime)
         {
-
-            dynamicBody.Acceleration = dynamicBody.ResultantForce * dynamicBody.InverseMass;
-            dynamicBody.Velocity += dynamicBody.Acceleration * deltaTime;
+            Vector2 acceleration = dynamicBody.ResultantForce * dynamicBody.InverseMass;
+            dynamicBody.Velocity += acceleration * deltaTime;
             transform.Position += dynamicBody.Velocity * deltaTime;
 
-            Debug.WriteLine($"Position: {transform.Position}, Velocity: {dynamicBody.Velocity}, Acceleration: {dynamicBody.Acceleration}");
+            Debug.WriteLine($"Position: {transform.Position}, Velocity: {dynamicBody.Velocity}, Acceleration: {acceleration}");
         }
 
-        private Vector2 GetResultantForce(DynamicBody dynamicBody)
+        private Vector2 GetResultantForce(PhysicsBody dynamicBody)
         {
             Vector2 totalForce = Vector2.Zero;
             foreach (Vector2 value in dynamicBody.Forces.Values)
@@ -116,7 +87,7 @@ namespace Halves_of_Tria.Systems
             return totalForce;
         }
 
-        private void UpdateForce(DynamicBody dynamicBody, ForceType forceType, Vector2 newValue, bool updateResultantForceAfter = true)
+        private void UpdateForce(PhysicsBody dynamicBody, ForceType forceType, Vector2 newValue, bool updateResultantForceAfter = true)
         {
             dynamicBody.Forces[forceType] = newValue;
 
@@ -126,7 +97,7 @@ namespace Halves_of_Tria.Systems
             }
         }
 
-        private void UpdateAllDynamicForces(DynamicBody dynamicBody, Transform2 transform)
+        private void UpdateAllDynamicForces(PhysicsBody dynamicBody, Transform2 transform)
         {
             Vector2 newLinearDrag = -Config.DefaultLinearDragCoefficient * dynamicBody.Velocity;
             UpdateForce(dynamicBody, ForceType.LinearDrag, newLinearDrag, false); // false to prevent repeated redundant updating when more forces are updated here
@@ -155,14 +126,14 @@ namespace Halves_of_Tria.Systems
             UpdateResultantForce(dynamicBody);
         }
 
-        private void ClearImpulses(DynamicBody dynamicBody)
+        private void ClearImpulses(PhysicsBody dynamicBody)
         {
             dynamicBody.UnspentImpulse = Vector2.Zero;
         }
         #endregion
 
         #region Helper Methods
-        private void UpdateResultantForce(DynamicBody dynamicBody)
+        private void UpdateResultantForce(PhysicsBody dynamicBody)
         {
             dynamicBody.ResultantForce = GetResultantForce(dynamicBody);
         }

@@ -20,7 +20,7 @@ namespace Halves_of_Tria.Factories
             salt.Attach(new Tags.Players.Salt());
             salt.Attach(new Transform2(position));
             salt.Attach(new AxisAlignedRectCollider(width, height));
-            salt.Attach(new DynamicBody(1));
+            salt.Attach(new PhysicsBody(1));
             salt.Attach(saltTexture);
             salt.Attach(new Speed(200));
 
