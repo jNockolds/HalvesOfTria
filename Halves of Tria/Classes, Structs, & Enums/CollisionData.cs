@@ -9,10 +9,10 @@ namespace Halves_of_Tria
 {
     internal struct CollisionData
     {
-        public int EntityId1 { get; set; }
-        public int EntityId2 { get; set; }
-        public Vector2 Normal { get; set; }
-        public float Depth { get; set; }
+        public int EntityId1 { get; private set; }
+        public int EntityId2 { get; private set; }
+        public Vector2 Normal { get; private set; }
+        public float Depth { get; private set; }
 
         public CollisionData(int entityId1, int entityId2, Vector2 normal, float depth)
         {

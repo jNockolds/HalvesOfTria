@@ -28,16 +28,16 @@ namespace Halves_of_Tria.Components
             get
             {
                 if (_inverseMass == 0f)
-                    return float.PositiveInfinity;
+                    return 0f; // should be "float.PositiveInfinity"
                 return 1f / _inverseMass;
             }
             set
             {
-                if (value <= 0f)
-                    throw new ArgumentOutOfRangeException("Mass must be positive.", nameof(value));
+                if (value < 0f)
+                    throw new ArgumentOutOfRangeException("Mass must be non-negative.", nameof(value));
 
-                if (float.IsInfinity(value))
-                    _inverseMass = 0f;
+                if (value == 0f) // should be "float.IsInfinity(value)"
+                        _inverseMass = 0f;
                 else
                     _inverseMass = 1f / value;
             }
@@ -52,7 +52,7 @@ namespace Halves_of_Tria.Components
 
         public PhysicsBody(float mass)
         {
-            if (mass == float.PositiveInfinity)
+            if (mass == 0f) // should be "float.PositiveInfinity"
                 InverseMass = 0f;
             else
             {

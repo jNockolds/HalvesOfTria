@@ -15,7 +15,8 @@ namespace Halves_of_Tria.Factories
             Texture2D texture = TextureGenerator.Rectangle(graphicsDevice, width, height, colour, true);
 
             Entity rectangle = GameHost.WorldInstance.CreateEntity();
-            rectangle.Attach(new Transform2(position));
+            rectangle.Attach(new Transform(position));
+            rectangle.Attach(new PhysicsBody());
             rectangle.Attach(new AxisAlignedRectCollider(width, height));
             rectangle.Attach(texture);
 

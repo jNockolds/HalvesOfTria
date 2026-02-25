@@ -75,21 +75,30 @@ namespace Halves_of_Tria
             WorldInstance = new WorldBuilder()
             .AddSystem(new SaltInputSystem())
             .AddSystem(new MiscInputSystem())
-            .AddSystem(new CollisionDetectionSystem(collisionsCache))
-            // [physics-related collision response systems go here]
-            // [non-physics-related collision response systems go here]
-            .AddSystem(new DynamicBodySystem())
+            .AddSystem(new PhysicsBodySystem())
+            .AddSystem(new CollisionConstraintSystem(collisionsCache))
+            .AddSystem(new VelocityUpdateSystem())
+            // [Velocity-related collision response system here (use )]
+            //     get each entity with a collision component (and transform and physics body)
+            //     find all entities both in the system's ActiveEntities and in ConfirmedCollisions
+            //     resolve velocities of the collisions
             .AddSystem(new RenderSystem(_spriteBatch))
             .AddSystem(new DebugVectorRenderSystem(GraphicsDevice, _spriteBatch))
             .Build();
 
 
-            PlayerFactories.CreateSalt(GraphicsDevice, new(WindowWidth / 2, 0.2f * WindowHeight));
-            MapTileFactories.CreateRectangle(GraphicsDevice, new(WindowWidth / 2, 0.9f * WindowHeight), (int)(0.9f * WindowWidth), (int)(0.1f * WindowHeight), Color.Brown);
+            Vector2 saltPos = new(WindowWidth / 2, 0.2f * WindowHeight);
+            PlayerFactories.CreateSalt(GraphicsDevice, saltPos);
+
+            Vector2 rectPos = new(WindowWidth / 2, 0.9f * WindowHeight);
+            MapTileFactories.CreateRectangle(GraphicsDevice, rectPos, (int)(0.9f * WindowWidth), (int)(0.1f * WindowHeight), Color.Brown);
         }
 
         protected override void Update(GameTime gameTime)
         {
+            float frameRate = 1f / (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Debug.WriteLine("FPS: " + frameRate);
+
             InputHandler.Update();
             WorldInstance.Update(gameTime);
             base.Update(gameTime);

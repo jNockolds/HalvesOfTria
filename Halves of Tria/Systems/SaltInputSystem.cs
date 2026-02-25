@@ -11,23 +11,23 @@ namespace Halves_of_Tria.Systems
     internal class SaltInputSystem : EntityProcessingSystem
     {
         #region Fields and Components
-        private ComponentMapper<Transform2> _transformMapper;
+        private ComponentMapper<Transform> _transformMapper;
         private ComponentMapper<Speed> _speedMapper;
         #endregion
 
         public SaltInputSystem()
-            : base(Aspect.All(typeof(Tags.Players.Salt), typeof(Transform2), typeof(Speed))) { }
+            : base(Aspect.All(typeof(Tags.Players.Salt), typeof(Transform), typeof(Speed))) { }
 
         #region Game Loop Methods
         public override void Initialize(IComponentMapperService mapperService)
         {
-            _transformMapper = mapperService.GetMapper<Transform2>();
+            _transformMapper = mapperService.GetMapper<Transform>();
             _speedMapper = mapperService.GetMapper<Speed>();
         }
 
         public override void Process(GameTime gameTime, int entityId)
         {
-            Transform2 transform = _transformMapper.Get(entityId);
+            Transform transform = _transformMapper.Get(entityId);
             Speed speed = _speedMapper.Get(entityId);
 
             DebugMoveOnInput(transform);
@@ -36,7 +36,7 @@ namespace Halves_of_Tria.Systems
         #endregion
 
         #region Helper Methods
-        private void DebugMoveOnInput(Transform2 transform)
+        private void DebugMoveOnInput(Transform transform)
         {
             if (InputHandler.IsActionDown(InputAction.SaltDebugMove))
             {
@@ -44,7 +44,7 @@ namespace Halves_of_Tria.Systems
                 transform.Position = mousePosition;
             }
         }
-        private void MoveOnInput(GameTime gameTime, Transform2 transform, Speed speed)
+        private void MoveOnInput(GameTime gameTime, Transform transform, Speed speed)
         {
 
             if (InputHandler.IsActionDown(InputAction.SaltWalkLeft))

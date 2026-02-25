@@ -29,8 +29,8 @@ namespace Halves_of_Tria.Systems
         //         - Todo: figure out how to dynamically handle this with any number of forces, and with forces at any rotation.
 
         #region Fields and Components
-        private ComponentMapper<Transform2> _transformMapper;
-        private ComponentMapper<PhysicsBody> _dynamicBodyMapper;
+        private ComponentMapper<Transform> _transformMapper;
+        private ComponentMapper<PhysicsBody> _physicsBodyMapper;
 
         private GraphicsDevice _graphicsDevice;
         private SpriteBatch _spriteBatch;
@@ -55,7 +55,7 @@ namespace Halves_of_Tria.Systems
         #endregion
 
         public DebugVectorRenderSystem(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
-            : base(Aspect.All(typeof(Transform2), typeof(PhysicsBody)))
+            : base(Aspect.All(typeof(Transform), typeof(PhysicsBody)))
         {
             _graphicsDevice = graphicsDevice;
             _spriteBatch = spriteBatch;
@@ -64,8 +64,8 @@ namespace Halves_of_Tria.Systems
         #region Game Loop Methods
         public override void Initialize(IComponentMapperService mapperService)
         {
-            _transformMapper = mapperService.GetMapper<Transform2>();
-            _dynamicBodyMapper = mapperService.GetMapper<PhysicsBody>();
+            _transformMapper = mapperService.GetMapper<Transform>();
+            _physicsBodyMapper = mapperService.GetMapper<PhysicsBody>();
 
             _vectorsShown = 0;
             _pixel = TextureGenerator.Pixel(_graphicsDevice, Color.White);
@@ -87,26 +87,22 @@ namespace Halves_of_Tria.Systems
 
             foreach (int entityId in ActiveEntities)
             {
-                Transform2 transform = _transformMapper.Get(entityId);
-                PhysicsBody dynamicBody = _dynamicBodyMapper.Get(entityId);
+                Transform transform = _transformMapper.Get(entityId);
+                PhysicsBody physicsBody = _physicsBodyMapper.Get(entityId);
 
                 switch (_vectorsShown)
                 {
                     case VectorType.Forces:
-                        foreach (Vector2 value in dynamicBody.Forces.Values)
+                        foreach (Vector2 value in physicsBody.Forces.Values)
                         {
                             DrawArrow(transform.Position, value, _forcesColour, _forceScaleFactor);
                         }
                         break;
                     case VectorType.ResultantForce:
-                        DrawArrow(transform.Position, dynamicBody.ResultantForce, _resultantForceColour, _forceScaleFactor);
-                        break;
-                    case VectorType.Acceleration:
-                        float accelerationScaleFactor = _forceScaleFactor * dynamicBody.InverseMass;
-                        DrawArrow(transform.Position, dynamicBody.Acceleration, _accelerationColour, accelerationScaleFactor);
+                        DrawArrow(transform.Position, physicsBody.ResultantForce, _resultantForceColour, _forceScaleFactor);
                         break;
                     case VectorType.Velocity:
-                        DrawArrow(transform.Position, dynamicBody.Velocity, _velocityColour, _velocityScaleFactor);
+                        DrawArrow(transform.Position, physicsBody.Velocity, _velocityColour, _velocityScaleFactor);
                         break;
                 }
             }

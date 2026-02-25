@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
+using Halves_of_Tria.Components;
 
 namespace Halves_of_Tria.Systems
 {
@@ -10,13 +11,13 @@ namespace Halves_of_Tria.Systems
     {
         #region Fields and Components
         private ComponentMapper<Texture2D> _textureMapper;
-        private ComponentMapper<Transform2> _transformMapper;
+        private ComponentMapper<Transform> _transformMapper;
 
         private readonly SpriteBatch _spriteBatch;
         #endregion
 
         public RenderSystem(SpriteBatch spriteBatch)
-            : base(Aspect.All(typeof(Texture2D), typeof(Transform2)))
+            : base(Aspect.All(typeof(Texture2D), typeof(Transform)))
         {
             _spriteBatch = spriteBatch;
         }
@@ -25,7 +26,7 @@ namespace Halves_of_Tria.Systems
         public override void Initialize(IComponentMapperService mapperService)
         {
             _textureMapper = mapperService.GetMapper<Texture2D>();
-            _transformMapper = mapperService.GetMapper<Transform2>();
+            _transformMapper = mapperService.GetMapper<Transform>();
         }
 
         public override void Draw(GameTime gameTime)
@@ -35,7 +36,7 @@ namespace Halves_of_Tria.Systems
             foreach (int entityId in ActiveEntities)
             {
                 Texture2D texture = _textureMapper.Get(entityId);
-                Transform2 transform = _transformMapper.Get(entityId);
+                Transform transform = _transformMapper.Get(entityId);
                 Vector2 topLeft = transform.Position - 0.5f * new Vector2(texture.Width, texture.Height);
                 _spriteBatch.Draw(texture, topLeft, Color.White);
             }
