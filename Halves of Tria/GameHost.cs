@@ -90,8 +90,12 @@ namespace Halves_of_Tria
             Vector2 saltPos = new(WindowWidth / 2, 0.2f * WindowHeight);
             PlayerFactories.CreateSalt(GraphicsDevice, saltPos);
 
-            Vector2 rectPos = new(WindowWidth / 2, 0.9f * WindowHeight);
+            float spacing = 1;
+            Vector2 rectPos = new(WindowWidth / 2, 0.9f * WindowHeight + spacing);
             MapTileFactories.CreateRectangle(GraphicsDevice, rectPos, (int)(0.9f * WindowWidth), (int)(0.1f * WindowHeight), Color.Brown);
+
+            Vector2 rect2Pos = new(0.9f * WindowWidth, 0.8f * WindowHeight);
+            MapTileFactories.CreateRectangle(GraphicsDevice, rect2Pos, (int)(0.1f * WindowWidth), (int)(0.1f * WindowHeight), Color.Green);
         }
 
         protected override void Update(GameTime gameTime)

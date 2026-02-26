@@ -20,7 +20,7 @@ namespace Halves_of_Tria.Systems
         private ComponentMapper<PhysicsBody> _physicsBodyMapper;
 
         private readonly CollisionsCache _collisionsCache;
-        private const int _iterationsPerFrame = 6;
+        private const int _iterationsPerFrame = 1;
         #endregion
 
         public CollisionConstraintSystem(CollisionsCache collisionsCache)
