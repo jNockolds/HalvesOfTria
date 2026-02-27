@@ -4,8 +4,9 @@ using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
-using System.Diagnostics;
 using System;
+using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Halves_of_Tria.Systems
 {
@@ -52,122 +53,148 @@ namespace Halves_of_Tria.Systems
         #region Helper Methods
         private void SolveAllConstraints()
         {
-            for (int entityId1 = 0; entityId1 < ActiveEntities.Count - 1; entityId1++)
+            for (int i = 0; i < ActiveEntities.Count - 1; i++)
             {
+                int entityId1 = ActiveEntities[i];
                 Transform transform1 = _transformMapper.Get(entityId1);
 
-                // if the first collider doesn't have a body:
-                bool hasBody1;
-                if (_physicsBodyMapper.TryGet(entityId1, out PhysicsBody body1))
-                    hasBody1 = true;
-                else
-                    hasBody1 = false;
+                // if the first collider has a body:
+                bool hasBody1 = _physicsBodyMapper.TryGet(entityId1, out PhysicsBody body1);
 
-
-                for (int entityId2 = entityId1 + 1; entityId2 < ActiveEntities.Count; entityId2++)
+                for (int j = i + 1; j < ActiveEntities.Count; j++)
                 {
+                    int entityId2 = ActiveEntities[j];
                     Transform transform2 = _transformMapper.Get(entityId2);
 
-                    // if the second collider doesn't have a body:
-                    bool hasBody2;
-                    if (_physicsBodyMapper.TryGet(entityId2, out PhysicsBody body2))
-                        hasBody2 = true;
+                    // if the second collider has a body:
+                    bool hasBody2 = _physicsBodyMapper.TryGet(entityId2, out PhysicsBody body2);
+
+                    bool isDynamicCollision;
+                    if (hasBody1 && hasBody2)
+                        isDynamicCollision = body1.InverseMass != 0 || body2.InverseMass != 0;
                     else
-                        hasBody2 = false;
+                        isDynamicCollision = false;
 
-                    // Circle-Circle:
-                    if (_circleColliderMapper.TryGet(entityId1, out CircleCollider circle1)
-                        && _circleColliderMapper.TryGet(entityId2, out CircleCollider circle2))
-                    {
-                        Debug.WriteLine("investigating collision (Circle-Circle)");
-                        CollisionData? collisionData = GetCollisionData(
-                            entityId1, transform1, circle1,
-                            entityId2, transform2, circle2);
-                        if (collisionData is CollisionData data) // pattern matching to avoid null data
-                        {
-                            Debug.WriteLine($"Collision detected between entities {entityId1} and {entityId2}.");
-                            _collisionsCache.ConfirmedCollisions.Add(data);
-
-                            if (hasBody1 && hasBody2)
-                            {
-                                ResolvePhysicalCollision(transform1, body1, transform2, body2, data);
-                            }
-                        }
-                    }
-
-                    // Circle-Rect:
-                    else if (_circleColliderMapper.TryGet(entityId1, out CircleCollider circle_CR)
-                             && _axisAlignedRectColliderMapper.TryGet(entityId2, out AxisAlignedRectCollider rect_CR))
-                    {
-                        Debug.WriteLine("investigating collision (Circle-Rect)");
-                        CollisionData? collisionData = GetCollisionData(
-                            entityId1, transform1, circle_CR,
-                            entityId2, transform2, rect_CR);
-                        if (collisionData is CollisionData data) // pattern matching to avoid null data
-                        {
-                            Debug.WriteLine($"Collision detected between entities {entityId1} and {entityId2}.");
-                            _collisionsCache.ConfirmedCollisions.Add(data);
-
-                            if (hasBody1 && hasBody2)
-                            {
-                                ResolvePhysicalCollision(transform1, body1, transform2, body2, data);
-                            }
-                        }
-                    }
-
-                    // Rect-Circle:
-                    else if (_axisAlignedRectColliderMapper.TryGet(entityId1, out AxisAlignedRectCollider rect_RC)
-                        && _circleColliderMapper.TryGet(entityId2, out CircleCollider circle_RC))
-                    {
-                        Debug.WriteLine("investigating collision (Rect-Circle)");
-                        CollisionData? collisionData = GetCollisionData(
-                            entityId2, transform2, circle_RC,
-                            entityId1, transform1, rect_RC);
-                        if (collisionData is CollisionData data) // pattern matching to avoid null data
-                        {
-                            Debug.WriteLine($"Collision detected between entities {entityId1} and {entityId2}.");
-                            _collisionsCache.ConfirmedCollisions.Add(data);
-
-                            if (hasBody1 && hasBody2)
-                            {
-                                ResolvePhysicalCollision(transform2, body2, transform1, body1, data);
-                            }
-                        }
-                    }
-
-                    // Rect-Rect:
-                    else if (_axisAlignedRectColliderMapper.TryGet(entityId1, out AxisAlignedRectCollider rect1)
-                        && _axisAlignedRectColliderMapper.TryGet(entityId2, out AxisAlignedRectCollider rect2))
-                    {
-                        Debug.WriteLine("investigating collision (Rect-Rect)");
-                        CollisionData? collisionData = GetCollisionData(
-                            entityId1, transform1, rect1,
-                            entityId2, transform2, rect2);
-                        if (collisionData is CollisionData data) // pattern matching to avoid null data
-                        {
-                            Debug.WriteLine($"Collision detected between entities {entityId1} and {entityId2}.");
-                            _collisionsCache.ConfirmedCollisions.Add(data);
-
-                            if (hasBody1 && hasBody2)
-                            {
-                                ResolvePhysicalCollision(transform1, body1, transform2, body2, data);
-                            }
-                        }
-                    }
+                    CheckAndResolveCollision(entityId1, transform1, body1, entityId2, transform2, body2, isDynamicCollision);
                 }
             }
         }
 
-        private void ResolvePhysicalCollision(Transform transform1, PhysicsBody body1, Transform transform2, PhysicsBody body2, CollisionData collisionData)
+        private void CheckAndResolveCollision(
+            int entityId1, Transform transform1, PhysicsBody body1,
+            int entityId2, Transform transform2, PhysicsBody body2,
+            bool isDynamicCollision)
         {
-            float coeff1 = -body1.InverseMass / (body1.InverseMass + body2.InverseMass);
-            float coeff2 = body2.InverseMass / (body1.InverseMass + body2.InverseMass);
+            // Circle-Circle:
+            if (_circleColliderMapper.TryGet(entityId1, out CircleCollider circle1)
+                && _circleColliderMapper.TryGet(entityId2, out CircleCollider circle2))
+            {
+                Debug.WriteLine("investigating collision (Circle-Circle)");
+                CollisionData? collisionData = GetCollisionData(
+                    entityId1, transform1, circle1,
+                    entityId2, transform2, circle2);
+
+                CheckAndResolveCollision(collisionData, isDynamicCollision, transform1, body1, transform2, body2);
+            }
+
+            // Circle-Rect:
+            else if (_circleColliderMapper.TryGet(entityId1, out CircleCollider circle_CR)
+                     && _axisAlignedRectColliderMapper.TryGet(entityId2, out AxisAlignedRectCollider rect_CR))
+            {
+                Debug.WriteLine("investigating collision (Circle-Rect)");
+                CollisionData? collisionData = GetCollisionData(
+                    entityId1, transform1, circle_CR,
+                    entityId2, transform2, rect_CR);
+
+                CheckAndResolveCollision(collisionData, isDynamicCollision, transform1, body1, transform2, body2);
+            }
+
+            // Rect-Circle:
+            else if (_axisAlignedRectColliderMapper.TryGet(entityId1, out AxisAlignedRectCollider rect_RC)
+                && _circleColliderMapper.TryGet(entityId2, out CircleCollider circle_RC))
+            {
+                Debug.WriteLine("investigating collision (Rect-Circle)");
+                CollisionData? collisionData = GetCollisionData(
+                    entityId2, transform2, circle_RC,
+                    entityId1, transform1, rect_RC);
+
+                CheckAndResolveCollision(collisionData, isDynamicCollision, transform1, body1, transform2, body2);
+            }
+
+            // Rect-Rect:
+            else if (_axisAlignedRectColliderMapper.TryGet(entityId1, out AxisAlignedRectCollider rect1)
+                && _axisAlignedRectColliderMapper.TryGet(entityId2, out AxisAlignedRectCollider rect2))
+            {
+                Debug.WriteLine("investigating collision (Rect-Rect)");
+                CollisionData? collisionData = GetCollisionData(
+                    entityId1, transform1, rect1,
+                    entityId2, transform2, rect2);
+
+                CheckAndResolveCollision(collisionData, isDynamicCollision, transform1, body1, transform2, body2);
+            }
+        }
+
+        private void CheckAndResolveCollision(CollisionData? collisionData, bool isDynamicCollision,
+            Transform transform1, PhysicsBody body1,
+            Transform transform2, PhysicsBody body2)
+        {
+            if (collisionData is CollisionData data) // pattern matching to avoid null data
+            {
+                Debug.WriteLine($"Collision detected between entities {data.EntityId1} and {data.EntityId2}.");
+                _collisionsCache.ConfirmedCollisions.Add(data);
+
+                ResolvePhysicsIfNeeded(transform1, body1, transform2, body2, data, isDynamicCollision);
+            }
+        }
+
+        private void ResolvePhysicsIfNeeded(
+            Transform transform1, PhysicsBody body1,
+            Transform transform2, PhysicsBody body2,
+            CollisionData collisionData, bool isDynamicCollision)
+        {
+            if (isDynamicCollision)
+            {
+                ResolvePhysicalCollision(transform1, body1, transform2, body2, collisionData);
+            }
+        }
+
+        private void ResolvePhysicalCollision(
+            Transform transform1, PhysicsBody body1, 
+            Transform transform2, PhysicsBody body2, 
+            CollisionData collisionData)
+        {
+            Vector2[] deltaPositions = CalculateDeltaPositions(body1, body2, collisionData);
+
+            transform1.Position += deltaPositions[0];
+            transform2.Position += deltaPositions[1];
+        }
+
+        private Vector2[] CalculateDeltaPositions(PhysicsBody body1, PhysicsBody body2, CollisionData collisionData)
+        {
+            float coeff1;
+            float coeff2;
+
+            // one has to have a non-zero inverse mass, so we don't need to do anything if they both have zero inverse mass
+            if (body1.InverseMass == 0)
+            {
+                coeff1 = 0;
+                coeff2 = 1;
+            }
+            else if (body2.InverseMass == 0)
+            {
+                coeff1 = -1;
+                coeff2 = 0;
+            }
+            else
+            {
+                coeff1 = -body1.InverseMass / (body1.InverseMass + body2.InverseMass);
+                coeff2 = body2.InverseMass / (body1.InverseMass + body2.InverseMass);
+            }
 
             Vector2 deltaPosition1 = coeff1 * collisionData.Depth * collisionData.Normal;
             Vector2 deltaPosition2 = coeff2 * collisionData.Depth * collisionData.Normal;
 
-            transform1.Position += deltaPosition1;
-            transform2.Position += deltaPosition2;
+            return [deltaPosition1, deltaPosition2];
         }
 
 

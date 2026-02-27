@@ -87,11 +87,11 @@ namespace Halves_of_Tria
             .Build();
 
 
-            Vector2 saltPos = new(WindowWidth / 2, 0.2f * WindowHeight);
+            Vector2 saltPos = new(0.5f * WindowWidth, 0.2f * WindowHeight);
             PlayerFactories.CreateSalt(GraphicsDevice, saltPos);
 
             float spacing = 1;
-            Vector2 rectPos = new(WindowWidth / 2, 0.9f * WindowHeight + spacing);
+            Vector2 rectPos = new(0.5f * WindowWidth, 0.9f * WindowHeight - spacing);
             MapTileFactories.CreateRectangle(GraphicsDevice, rectPos, (int)(0.9f * WindowWidth), (int)(0.1f * WindowHeight), Color.Brown);
 
             Vector2 rect2Pos = new(0.9f * WindowWidth, 0.8f * WindowHeight);
@@ -100,11 +100,12 @@ namespace Halves_of_Tria
 
         protected override void Update(GameTime gameTime)
         {
-            float frameRate = 1f / (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Debug.WriteLine("FPS: " + frameRate);
+            float frameRate2 = 1f / (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Debug.WriteLine("FPS: " + frameRate2);
 
             InputHandler.Update();
             WorldInstance.Update(gameTime);
+
             base.Update(gameTime);
         }
 

@@ -14,9 +14,6 @@ namespace Halves_of_Tria.Systems
         #region Fields and Components
         private ComponentMapper<PhysicsBody> _physicsBodyMapper;
         private ComponentMapper<Transform> _transformMapper;
-
-        private float _requiredYVelocityForBounce = 200;
-        private float _bounceIntensity = 50;
         #endregion
 
         public PhysicsBodySystem()
