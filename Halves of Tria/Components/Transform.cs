@@ -17,6 +17,10 @@ namespace Halves_of_Tria.Components
             get => _position;
             set
             {
+                if (float.IsNaN(value.X))
+                    throw new ArgumentException("Position.X cannot be NaN", nameof(value));
+                if (float.IsNaN(value.Y))
+                    throw new ArgumentException("Position.Y cannot be NaN", nameof(value));
                 _position = value;
                 Debug.WriteLine("Set position to " + value);
             }

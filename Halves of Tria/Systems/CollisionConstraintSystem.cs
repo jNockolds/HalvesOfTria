@@ -11,7 +11,9 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Halves_of_Tria.Systems
 {
     // To Implement later on: 
-    // - Broad-phase and then narrow-phase checks for collisions (for optimisation, but only if needed)
+    // - Broad-phase and then narrow-phase checks for collisions (for optimisation)
+    //     - (spatial grid, quadtree, sweep-and-prune)
+    // - Add continuous collision detection (swept tests) 
     internal class CollisionConstraintSystem : EntityUpdateSystem
     {
         #region Fields and Components
@@ -86,6 +88,7 @@ namespace Halves_of_Tria.Systems
             bool isDynamicCollision)
         {
             // Circle-Circle:
+            
             if (_circleColliderMapper.TryGet(entityId1, out CircleCollider circle1)
                 && _circleColliderMapper.TryGet(entityId2, out CircleCollider circle2))
             {
